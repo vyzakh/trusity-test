@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+@plugin '../hero.ts';
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+/* @custom-variant dark (&:is(.dark *)) */
+
+@theme {
+  /* Custom CSS Variables */
+  --header-height: 3.875rem;
+  --sidebar-width: 15rem;
+  --nav-icon-size: 1.3rem;
+  --sidebar-bg: radial-gradient(
+    101.83% 101.83% at 50% -1.83%,
+    #d4e2f2 0%,
+    #e9edf2 39.9%
+  );
+  --submenu-bg: radial-gradient(
+    101.83% 101.83% at 50% -1.83%,
+    #d4e2f2 0%,
+    #d9dfe7 39.9%
+  );
+  --nav-item-sub-height: 36px;
+  --dashboard-bg: radial-gradient(
+    101.83% 170.83% at 50% -1.83%,
+    #bfd8ff 0%,
+    #fefefe 39.9%
+  );
+  --header-border: 0.5px solid;
+  --header-border-image: linear-gradient(
+    90deg,
+    rgba(153, 153, 153, 0.14) 0%,
+    rgba(154, 154, 154, 0.2) 52.4%,
+    rgba(153, 153, 153, 0.14) 100%
+  );
+
+  /* Font Family Definitions */
+  --font-inter: "Inter", sans-serif;
+  --font-helvetica: "Helvetica", sans-serif;
+}
+
+/* Font Face Declarations */
+/* Inter */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../assets/fonts/inter/Inter-Light.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/inter/Inter-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../assets/fonts/inter/Inter-Medium.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../assets/fonts/inter/Inter-SemiBold.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../assets/fonts/inter/Inter-Bold.ttf) format("truetype");
+}
+
+/* Helvetica */
+@font-face {
+  font-family: "Helvetica";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../assets/fonts/helvetica/Helvetica-Light.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Helvetica";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/helvetica/Helvetica.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Helvetica";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../assets/fonts/helvetica/Helvetica-Bold.ttf) format("truetype");
+}
+
+/* Base Styles */
+html {
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth !important;
+}
+
+body {
+  @apply text-sm;
+}
+
+body,
+#root,
+[data-overlay-container="true"] {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+/* Utility Classes */
+@utility radial-background-fixed {
+  &::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--dashboard-bg);
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+}
+
+@utility sub-nav-item {
+  &::before {
+    top: 3px;
+    left: -15px;
+    content: "";
+    position: absolute;
+    background-color: #c5cede;
+    mask: url("/icons/dashboard/sidebar/Curve.svg") no-repeat center;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+@utility sidebar-bg {
+  background: var(--sidebar-bg);
+}
+
+@utility required {
+  @apply relative;
+
+  &::after {
+    position: absolute;
+    margin-left: 2px;
+    margin-right: 2px;
+    color: theme(colors.red.500);
+    content: "*";
+  }
+}
