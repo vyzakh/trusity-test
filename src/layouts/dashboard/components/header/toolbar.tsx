@@ -1,3 +1,5 @@
+import { handleToggleDrawer } from "@/core/lib/redux/features/layoutSlice";
+import { useAppDispatch } from "@/core/lib/redux/hooks";
 import { Badge } from "@heroui/badge";
 import { Button } from "@heroui/button";
 import {
@@ -44,6 +46,11 @@ const BellIcon = () => (
 );
 
 export default function Toolbar() {
+  const dispatch = useAppDispatch();
+
+  const handleOpenDrawer = () => {
+    dispatch(handleToggleDrawer());
+  };
   return (
     <section className="flex shrink-0 items-center gap-2 sm:px-5">
       <Badge classNames={{ badge: "text-sm" }} color="danger" content="50">
@@ -65,7 +72,12 @@ export default function Toolbar() {
           <BellIcon />
         </Button>
       </Badge>
-      <Button isIconOnly className="rounded-full sm:hidden" variant="light">
+      <Button
+        onPress={handleOpenDrawer}
+        isIconOnly
+        className="rounded-full sm:hidden"
+        variant="light"
+      >
         <svg
           height={24}
           viewBox="0 0 24 24"

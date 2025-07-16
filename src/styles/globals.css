@@ -162,7 +162,7 @@ body,
     position: absolute;
     margin-left: 2px;
     margin-right: 2px;
-    color: theme(colors.red.500);
+    color: hsl(var(--heroui-danger) / 1);
     content: "*";
   }
 }

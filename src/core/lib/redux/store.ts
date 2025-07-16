@@ -4,7 +4,7 @@ import { configureStore } from "@reduxjs/toolkit";
 // import { storage } from "../../utils/storage";
 
 // import authSlice from "./features/authSlice";
-// import layoutSlice from "./features/layoutSlice";
+import layoutSlice from "./features/layoutSlice";
 // import signUpSlice from "./features/signUpSlice";
 
 // const getStoredAuthData = (): Omit<LoginResponse["login"], "message"> & {
@@ -29,7 +29,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 export const store = configureStore({
   reducer: {
-    // layout: layoutSlice,
+    layout: layoutSlice,
     // auth: authSlice,
     // signUp: signUpSlice,
   },

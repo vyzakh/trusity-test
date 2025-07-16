@@ -1,4 +1,5 @@
 import Content from "./components/content";
+import SideDrawer from "./components/drawer";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar";
 
@@ -12,6 +13,7 @@ export default function DashboardLayout() {
       <Header />
       <Sidebar />
       <Content />
+      <SideDrawer />
     </div>
   );
 }
