@@ -24,10 +24,7 @@ export const CreateSchoolSchema = z
     customCurriculum: z.string().optional(),
 
     totalLicense: z
-      .string({
-        required_error: "Total number of licenses is required",
-        invalid_type_error: "Total licenses must be a numeric value",
-      })
+      .string("Total licenses must be a numeric value")
       .refine((val) => /^\d+$/.test(val), {
         message: "Total licenses must be a whole number",
       })
@@ -54,9 +51,7 @@ export const CreateSchoolSchema = z
 
     contact: z.object({
       name: z.string().min(1, { message: "Point of contact name is required" }),
-      email: z
-        .string()
-        .email({ message: "Please enter a valid email address" }),
+      email: z.email({ message: "Please enter a valid email address" }),
       contactNumber: z
         .string()
         .min(1, { message: "Point of contact number is required" })

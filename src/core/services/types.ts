@@ -28,8 +28,8 @@ export type MutationResponse<T extends string> = {
 };
 
 export type PaginationInput = {
-  limit: number;
-  offset: number;
+  limit?: number;
+  offset?: number;
 };
 
 export type BusinessType = "B2B" | "B2C";

@@ -1,4 +1,4 @@
-import { BusinessType, PaginationInput } from "@/core/services/types";
+import type { BusinessType, PaginationInput } from "@/core/services/types";
 
 export type StudentsQueryResponse = {
   students: {
@@ -11,6 +11,10 @@ export type StudentsQueryResponse = {
   totalStudents: number;
 };
 
+export type TotalStudentsQueryResponse = {
+  totalStudents: number;
+};
+
 export type StudentQueryInput = PaginationInput & {
   schoolId?: string;
   teacherId?: string;
@@ -18,4 +22,42 @@ export type StudentQueryInput = PaginationInput & {
   schoolGradeId?: string;
   name?: string;
   accountType?: BusinessType;
+};
+
+export type StudentQueryResponse = {
+  student: {
+    id: string;
+    name: string;
+    email: string;
+    dateOfBirth: string;
+    accountType: string;
+    contactNumber: string;
+    guardian: {
+      name: string;
+      email: string;
+      contactNumber: string;
+    };
+    grade:
+      | {
+          id: string;
+          grade: {
+            id: string;
+            grade: string;
+          };
+        }
+      | {
+          text: string;
+        };
+    section:
+      | {
+          text: string;
+        }
+      | {
+          id: string;
+          section: {
+            id: string;
+            section: string;
+          };
+        };
+  };
 };

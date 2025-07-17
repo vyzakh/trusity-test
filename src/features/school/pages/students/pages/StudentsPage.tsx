@@ -157,6 +157,8 @@ export default function StudentsPage() {
                     radius="full"
                     size="sm"
                     variant="light"
+                    as={Link}
+                    to={`${student.id}/update`}
                   >
                     <svg
                       fill="none"

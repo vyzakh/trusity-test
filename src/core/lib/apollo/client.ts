@@ -8,7 +8,6 @@ import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 
 // import { showSessionExpiryModal } from '../redux/features/authSlice';
-import { store } from "../redux/store";
 
 import { APP_CONFIG } from "@/config/appConfig";
 
@@ -32,20 +31,20 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const httpLink = createHttpLink({
   uri: APP_CONFIG.GRAPHQL_BASE_URL,
-  credentials: "include",
+  // credentials: "include",
 });
 
 const authLink = setContext((_, { headers }) => {
-  const state = store.getState();
-  const tenantKey = state.auth?.tenant?.tenantKey;
-  const accessToken = state.auth?.accessToken;
+  // const state = store.getState();
+  // const tenantKey = state.auth?.tenant?.tenantKey;
+  // const accessToken = state.auth?.accessToken;
 
   return {
     headers: {
       ...headers,
       "Content-Type": "application/json",
-      ...(tenantKey && { "x-tenant-id": tenantKey }),
-      ...(accessToken && { "x-auth-token": accessToken }),
+      // ...(tenantKey && { "x-tenant-id": tenantKey }),
+      // ...(accessToken && { "x-auth-token": accessToken }),
     },
   };
 });

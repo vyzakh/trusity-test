@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { Form } from "@heroui/form";
 import {
   TableBody,
@@ -55,7 +55,7 @@ type UpdateTeacherPayload = {
     name: string;
     email: string;
     contactNumber: string;
-    grades: { grade: number; sectionIds: number[] }[];
+    schoolSectionIds: string[];
   };
 };
 
@@ -65,6 +65,7 @@ export default function UpdateTeacherPage() {
     schoolId: string;
     teacherId: string;
   }>();
+  const client = useApolloClient();
 
   const { data: teacherData } = useQuery<
     TeacherQueryResponse,
@@ -74,7 +75,13 @@ export default function UpdateTeacherPage() {
   const [updateTeacher, { loading: isUpdatingTeacher }] = useMutation<
     UpdateTeacherResponse,
     UpdateTeacherPayload
-  >(UPDATE_TEACHER_MUTATION);
+  >(UPDATE_TEACHER_MUTATION, {
+    onCompleted: () => {
+      client.cache.evict({ fieldName: "teachers" });
+      client.cache.evict({ fieldName: "totalTeachers" });
+      client.cache.gc();
+    },
+  });
 
   //LIST ALL GRADES BY SCHOOL QUERY
   const { data: schoolData, loading: isLoading } = useQuery<
@@ -112,18 +119,18 @@ export default function UpdateTeacherPage() {
         grade.sections.map((section) => section.id),
       );
 
-      // const response = await updateTeacher({
-      //   variables: {
-      //     schoolId: schoolId!,
-      //     input: { ...rest, schoolSectionIds },
-      //   },
-      // });
+      const response = await updateTeacher({
+        variables: {
+          teacherId: teacherId!,
+          input: { ...rest, schoolSectionIds },
+        },
+      });
 
-      // addToast({
-      //   title: response?.data?.createTeacher?.message,
-      //   color: "success",
-      // });
-      navigate("..");
+      addToast({
+        title: response?.data?.updateTeacher?.message,
+        color: "success",
+      });
+      navigate("../..");
     } catch (error) {
       const errMsg = handleApolloError(error);
 
@@ -173,9 +180,13 @@ export default function UpdateTeacherPage() {
           {
             label: schoolData?.school?.name,
             isLoading: isLoading,
-            to: "..",
+            to: "../..",
           },
-          { label: "Update Teacher" },
+          {
+            label: teacherData?.teacher?.name,
+            isLoading: isLoading,
+          },
+          { label: "Update" },
         ]}
       />
       <h1 className={title({ size: "lg" })}>Update Teacher</h1>

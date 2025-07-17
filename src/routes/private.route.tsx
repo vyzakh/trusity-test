@@ -20,6 +20,7 @@ import {
   TeachersPage,
   UpdateGradePage,
   UpdateSchoolPage,
+  UpdateStudentPage,
   UpdateTeacherPage,
 } from "@/features";
 import { GlobalTeachersPage } from "@/features/teachers/pages";
@@ -111,6 +112,10 @@ const privateRoutes: RouteObject[] = [
                     path: "students",
                     children: [
                       { path: "create", element: <CreateStudentPage /> },
+                      {
+                        path: ":studentId/update",
+                        element: <UpdateStudentPage />,
+                      },
                     ],
                   },
                   {

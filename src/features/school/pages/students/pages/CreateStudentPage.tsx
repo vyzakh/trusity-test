@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { AutocompleteItem } from "@heroui/autocomplete";
 import { Form } from "@heroui/form";
 import { SelectItem } from "@heroui/select";
@@ -10,7 +10,6 @@ import React from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 
-import { SCHOOLS_QUERY } from "../../schools/services/schoolQueries";
 import { GuardianDetails } from "../components";
 import {
   CreateB2BStudentSchema,
@@ -45,6 +44,7 @@ type CreateStudentInput = Omit<
 
 export default function CreateStudentPage() {
   const { schoolId } = useParams();
+  const client = useApolloClient();
   const navigate = useNavigate();
   const [sections, setSections] = React.useState<
     { id: string; section: string }[]
@@ -67,7 +67,13 @@ export default function CreateStudentPage() {
       accountType: BusinessType;
       input: CreateStudentInput;
     }
-  >(CREATE_B2B_STUDENT_MUTATION, { refetchQueries: [SCHOOLS_QUERY] });
+  >(CREATE_B2B_STUDENT_MUTATION, {
+    onCompleted: () => {
+      client.cache.evict({ fieldName: "students" });
+      client.cache.evict({ fieldName: "totalStudents" });
+      client.cache.gc();
+    },
+  });
 
   //RHF CONFIG
   const methods = useForm<CreateB2BStudentSchemaType>({
@@ -96,8 +102,10 @@ export default function CreateStudentPage() {
 
     try {
       const schoolGradeSectionId = schoolData?.school?.grades
-        ?.find((g) => g.grade.id === Number(data.gradeId))
+        ?.find((g) => g.id === data.gradeId)
         ?.sections?.find((s) => s.id === data.sectionId)?.id;
+
+      console.log(schoolGradeSectionId);
 
       const response = await createStudent({
         variables: {

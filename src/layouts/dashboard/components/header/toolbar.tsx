@@ -52,7 +52,7 @@ export default function Toolbar() {
     dispatch(handleToggleDrawer());
   };
   return (
-    <section className="flex shrink-0 items-center gap-2 sm:px-5">
+    <section className="flex shrink-0 items-center gap-2 sm:pe-5">
       <Badge classNames={{ badge: "text-sm" }} color="danger" content="50">
         <Button isIconOnly className="lg:hidden" radius="full" variant="light">
           <svg
@@ -119,8 +119,8 @@ export default function Toolbar() {
                 src: "https://i.pravatar.cc/150?u=a04258a2462d826712d",
               }}
               classNames={{
-                name: "max-w-36 truncate",
-                description: "max-w-36 truncate",
+                name: "max-w-24 truncate",
+                description: "max-w-24 truncate",
               }}
               description="Admin"
               name="Mubashir K P"

@@ -62,6 +62,8 @@ export default function UpdateSchoolPage() {
     defaultValues: DEFAULT_VALUES,
   });
 
+  console.log(methods.getValues());
+
   //SCHOOL UPDATE HANDLER
   const handleUpdateSchool = async (data: CreateSchoolSchemaType) => {
     const { logo, curriculums, customCurriculum, totalLicense, ...rest } = data;
@@ -103,14 +105,9 @@ export default function UpdateSchoolPage() {
     }
   };
 
-  //FORM CANCEL HANDLER
-  const handleCancel = () => {
-    methods.reset();
-  };
-
-  //SETTING DEFAULT VALUES
-  React.useEffect(() => {
-    if (schoolData) {
+  //FORM RESET HANDLER
+  const handleReset = React.useCallback(() => {
+    if (schoolData?.school) {
       const { address, contact, curriculums, license, logoUrl, name } =
         schoolData.school;
 
@@ -119,10 +116,10 @@ export default function UpdateSchoolPage() {
         logo: logoUrl,
         curriculums: curriculums,
         address: {
+          countryId: address.country.id?.toString(),
           stateId: address?.state?.id.toString(),
           cityId: address?.city?.id.toString(),
           contactNumber: address.contactNumber,
-          countryId: address.country.id?.toString(),
           postalCode: address.postalCode,
           streetAddressLine1: address.streetAddressLine1,
           streetAddressLine2: address.streetAddressLine2,
@@ -134,6 +131,11 @@ export default function UpdateSchoolPage() {
       });
     }
   }, [schoolData, methods]);
+
+  //SETTING DEFAULT VALUES
+  React.useEffect(() => {
+    handleReset();
+  }, [handleReset]);
 
   return (
     <PageWrapper>
@@ -164,9 +166,8 @@ export default function UpdateSchoolPage() {
               <Button
                 color="default"
                 disabled={isCreating}
-                type="reset"
                 variant="flat"
-                onPress={handleCancel}
+                onPress={handleReset}
               >
                 Reset
               </Button>

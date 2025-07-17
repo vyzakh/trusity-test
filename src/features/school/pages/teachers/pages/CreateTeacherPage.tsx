@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { Form } from "@heroui/form";
 import {
   TableBody,
@@ -57,11 +57,18 @@ type CreateTeacherPayload = {
 export default function CreateTeacherPage() {
   const navigate = useNavigate();
   const { schoolId } = useParams<{ schoolId: string }>();
+  const client = useApolloClient();
 
   const [createTeacher, { loading: isCreatingTeacher }] = useMutation<
     CreateTeacherResponse,
     CreateTeacherPayload
-  >(CREATE_TEACHER_MUTATION);
+  >(CREATE_TEACHER_MUTATION, {
+    onCompleted: () => {
+      client.cache.evict({ fieldName: "teachers" });
+      client.cache.evict({ fieldName: "totalTeachers" });
+      client.cache.gc();
+    },
+  });
 
   //LIST ALL GRADES BY SCHOOL QUERY
   const { data: schoolData, loading: isLoading } = useQuery<
