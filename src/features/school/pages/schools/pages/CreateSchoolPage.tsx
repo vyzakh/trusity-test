@@ -1,10 +1,9 @@
-import { useApolloClient, useMutation } from "@apollo/client";
-import { BreadcrumbItem, Breadcrumbs } from "@heroui/breadcrumbs";
+import { useMutation } from "@apollo/client";
 import { Form } from "@heroui/form";
 import { addToast } from "@heroui/toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 import { Address, BasicInfo, PointOfContact } from "../components";
 import {
@@ -15,9 +14,9 @@ import { CREATE_SCHOOL_MUTATION } from "../services/schoolMutations";
 import { DEFAULT_VALUES } from "../utils/constants";
 
 import { FormWrapper, PageWrapper } from "@/components";
-import { title } from "@/components/primitives";
-import { Button } from "@/components/ui";
+import { BreadcrumbNav, Button } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
+import { SCHOOLS_QUERY, TOTAL_SCHOOLS_QUERY } from "../services/schoolQueries";
 import type {
   CreateSchoolPayload,
   CreateSchoolResponse,
@@ -25,18 +24,16 @@ import type {
 
 export default function CreateSchoolPage() {
   const navigate = useNavigate();
-  const client = useApolloClient();
 
   //CREATE SCHOOL MUTATION
   const [createSchool, { loading: isCreating }] = useMutation<
     CreateSchoolResponse,
     { input: CreateSchoolPayload }
   >(CREATE_SCHOOL_MUTATION, {
-    onCompleted: () => {
-      client.cache.evict({ fieldName: "schools" });
-      client.cache.evict({ fieldName: "totalSchools" });
-      client.cache.gc();
-    },
+    refetchQueries: [
+      { query: SCHOOLS_QUERY, variables: { limit: 10, offset: 0 } },
+      { query: TOTAL_SCHOOLS_QUERY },
+    ],
   });
 
   //RHF CONFIG
@@ -93,15 +90,16 @@ export default function CreateSchoolPage() {
   };
 
   return (
-    <PageWrapper>
-      <Breadcrumbs underline="hover">
-        <BreadcrumbItem>
-          <Link to="/schools">Schools</Link>
-        </BreadcrumbItem>
-        <BreadcrumbItem>Add School</BreadcrumbItem>
-      </Breadcrumbs>
-      <h1 className={title({ size: "lg" })}>Add School</h1>
-
+    <PageWrapper
+      slots={{
+        breadcrumb: (
+          <BreadcrumbNav
+            items={[{ label: "Schools", to: ".." }, { label: "Add School" }]}
+          />
+        ),
+        title: "Add School",
+      }}
+    >
       <FormWrapper>
         <FormProvider {...methods}>
           <Form

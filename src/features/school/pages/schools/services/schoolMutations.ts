@@ -4,6 +4,9 @@ export const CREATE_SCHOOL_MUTATION = gql`
   mutation CreateSchools($input: CreateSchoolInput!) {
     createSchool(input: $input) {
       message
+      school {
+        id
+      }
     }
   }
 `;

@@ -1,4 +1,4 @@
-import { useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Form } from "@heroui/form";
 import { addToast } from "@heroui/toast";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,12 +12,11 @@ import {
   type CreateSchoolSchemaType,
 } from "../schemas/createSchoolSchema";
 import { UPDATE_SCHOOL_MUTATION } from "../services/schoolMutations";
-import { SCHOOL_QUERY } from "../services/schoolQueries";
+import { SCHOOL_QUERY, SCHOOLS_QUERY } from "../services/schoolQueries";
 
 import { DEFAULT_VALUES } from "../utils/constants";
 
 import { FormWrapper, PageWrapper } from "@/components";
-import { title } from "@/components/primitives";
 import { BreadcrumbNav, Button } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import type {
@@ -29,7 +28,6 @@ import type {
 export default function UpdateSchoolPage() {
   const { schoolId } = useParams<{ schoolId: string }>();
   const navigate = useNavigate();
-  const client = useApolloClient();
   const location = useLocation();
 
   const from = location.state?.from || "/schools";
@@ -47,12 +45,10 @@ export default function UpdateSchoolPage() {
     UpdateSchoolResponse,
     { input: CreateSchoolPayload; schoolId: string }
   >(UPDATE_SCHOOL_MUTATION, {
-    onCompleted: () => {
-      client.cache.evict({ fieldName: "schools" });
-      client.cache.evict({ fieldName: "school" });
-      client.cache.evict({ fieldName: "totalSchools" });
-      client.cache.gc();
-    },
+    refetchQueries: [
+      { query: SCHOOLS_QUERY, variables: { limit: 10, offset: 0 } },
+      { query: SCHOOL_QUERY, variables: { schoolId: schoolId! } },
+    ],
   });
 
   //RHF CONFIG
@@ -61,8 +57,6 @@ export default function UpdateSchoolPage() {
     resolver: zodResolver(CreateSchoolSchema),
     defaultValues: DEFAULT_VALUES,
   });
-
-  console.log(methods.getValues());
 
   //SCHOOL UPDATE HANDLER
   const handleUpdateSchool = async (data: CreateSchoolSchemaType) => {
@@ -138,20 +132,24 @@ export default function UpdateSchoolPage() {
   }, [handleReset]);
 
   return (
-    <PageWrapper>
-      <BreadcrumbNav
-        items={[
-          { label: "Schools", to: "../.." },
-          {
-            label: schoolData?.school?.name,
-            isLoading: isLoadingSchoolData,
-            to: "..",
-          },
-          { label: "Update" },
-        ]}
-      />
-
-      <h1 className={title({ size: "lg" })}>Update School</h1>
+    <PageWrapper
+      slots={{
+        breadcrumb: (
+          <BreadcrumbNav
+            items={[
+              { label: "Schools", to: "../.." },
+              {
+                label: schoolData?.school?.name,
+                isLoading: isLoadingSchoolData,
+                to: "..",
+              },
+              { label: "Update" },
+            ]}
+          />
+        ),
+        title: "Update School",
+      }}
+    >
       <FormWrapper>
         <FormProvider {...methods}>
           <Form

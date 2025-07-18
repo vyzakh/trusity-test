@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { Link } from "react-router";
 
-import B2BStudentForm from "../components/B2BStudentForm";
-import B2CStudentForm from "../components/B2CStudentForm";
+import B2BStudentForm from "../components/CreateStudent/B2BStudentForm";
+import B2CStudentForm from "../components/CreateStudent/B2CStudentForm";
 
 import { title } from "@/components/primitives";
 import { Button } from "@/components/ui";

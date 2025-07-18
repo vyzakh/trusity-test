@@ -1,4 +1,4 @@
-import { useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Form } from "@heroui/form";
 import {
   TableBody,
@@ -8,7 +8,6 @@ import {
   TableRow,
 } from "@heroui/table";
 import { addToast } from "@heroui/toast";
-import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
@@ -38,6 +37,7 @@ import {
 import { handleApolloError } from "@/core/errors";
 import { omitKeys } from "@/core/utils/object";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
+import { TEACHERS_QUERY } from "@/features/teachers/services/teachersQuery";
 import type {
   TeacherQueryResponse,
   UpdateTeacherResponse,
@@ -65,7 +65,6 @@ export default function UpdateTeacherPage() {
     schoolId: string;
     teacherId: string;
   }>();
-  const client = useApolloClient();
 
   const { data: teacherData } = useQuery<
     TeacherQueryResponse,
@@ -76,11 +75,9 @@ export default function UpdateTeacherPage() {
     UpdateTeacherResponse,
     UpdateTeacherPayload
   >(UPDATE_TEACHER_MUTATION, {
-    onCompleted: () => {
-      client.cache.evict({ fieldName: "teachers" });
-      client.cache.evict({ fieldName: "totalTeachers" });
-      client.cache.gc();
-    },
+    refetchQueries: [
+      { query: TEACHERS_QUERY, variables: { limit: 10, offset: 0, schoolId } },
+    ],
   });
 
   //LIST ALL GRADES BY SCHOOL QUERY
@@ -143,18 +140,21 @@ export default function UpdateTeacherPage() {
     reset();
   };
 
+  //ADD GRADE AND SECTIONS HANDLER
   const handleAddGradeAndSections = (
     data: CreateTeacherSchemaType["grades"][0],
   ) => {
     setValue("grades", [...addedGrades, data], { shouldValidate: true });
   };
 
+  //DELETE GRADE HANDLER
   const handleDeleteGrade = (id: string) => {
     const newGrades = addedGrades?.filter((g) => g.id !== id);
 
     setValue("grades", newGrades, { shouldValidate: true });
   };
 
+  //SET INITIAL DATA BASED ON TEACHER
   React.useEffect(() => {
     if (teacherData) {
       const { contactNumber, email, grades, name } = teacherData.teacher;
@@ -344,7 +344,6 @@ export default function UpdateTeacherPage() {
           >
             Save
           </Button>
-          <DevTool control={control} />
         </div>
       </FormWrapper>
     </PageWrapper>

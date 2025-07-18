@@ -24,10 +24,14 @@ import Pagination from "@/components/ui/pagination";
 import { DEFAULT_ROW_STYLES, Table } from "@/components/ui/table";
 import { usePagination } from "@/core/hooks/usePagination";
 import { getSerialNumber } from "@/core/utils/pagination";
-import { STUDENTS_QUERY } from "@/features/students/services/studentQueries";
+import {
+  STUDENTS_QUERY,
+  TOTAL_STUDENTS_QUERY,
+} from "@/features/students/services/studentQueries";
 import type {
   StudentQueryInput,
   StudentsQueryResponse,
+  TotalStudentsQueryResponse,
 } from "@/features/students/services/types";
 
 const columns = [
@@ -64,12 +68,24 @@ export default function StudentsPage() {
         Object.entries(filters).filter(([, value]) => value != null),
       ),
     },
+  });
 
-    returnPartialData: true,
+  //STUDENTS QUERY
+  const { data: total } = useQuery<
+    TotalStudentsQueryResponse,
+    StudentQueryInput
+  >(TOTAL_STUDENTS_QUERY, {
+    variables: {
+      schoolId: schoolId,
+      ...(debouncedName && { name: debouncedName }),
+      ...Object.fromEntries(
+        Object.entries(filters).filter(([, value]) => value != null),
+      ),
+    },
   });
 
   const students = studentsData?.students ?? [];
-  const totalStudents = studentsData?.totalStudents ?? 0;
+  const totalStudents = total?.totalStudents ?? 0;
 
   //SEARCH HANDLER
   const handleSearch = (value: string) => {

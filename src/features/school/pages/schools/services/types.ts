@@ -1,4 +1,8 @@
-import type { MutationResponse } from "@/core/services/types";
+import type {
+  BusinessType,
+  MutationResponse,
+  PaginationInput,
+} from "@/core/services/types";
 
 export type BaseEntity = {
   id: string;
@@ -124,7 +128,7 @@ export type TotalSchoolsQueryResponse = { totalSchools: number };
 ///MUTATION PAYLOAD AND RESPONSE
 
 export type CreateSchoolPayload = {
-  accountType: "B2B" | "B2C";
+  accountType: BusinessType;
   name: string;
   logoUrl: string;
   totalLicense: number;
@@ -148,5 +152,26 @@ export type CreateSchoolPayload = {
   }[];
 };
 
-export type CreateSchoolResponse = MutationResponse<"createSchool">;
+export type CreateB2CSchoolPayload = {
+  accountType: BusinessType;
+  name: string;
+  address: {
+    streetAddressLine1: string;
+    streetAddressLine2: string | null;
+    cityId: string;
+    stateId: string;
+    countryId: string;
+    postalCode: string;
+  };
+};
+
+export type SchoolsInput = PaginationInput & {
+  name?: string | null;
+  accountType?: BusinessType;
+};
+
+export type CreateSchoolResponse = MutationResponse<
+  "createSchool",
+  { school: { id: string } }
+>;
 export type UpdateSchoolResponse = MutationResponse<"updateSchool">;

@@ -54,7 +54,11 @@ export default function GradesPage() {
   const [deleteGrade, { loading: isDeleting }] = useMutation<
     DeleteSchoolGradeResponse,
     { schoolGradeId: string }
-  >(DELETE_GRADE_MUTATION, { refetchQueries: [GRADES_BY_SCHOOL_QUERY] });
+  >(DELETE_GRADE_MUTATION, {
+    refetchQueries: [
+      { query: GRADES_BY_SCHOOL_QUERY, variables: { schoolId } },
+    ],
+  });
 
   //DESTRUCTURING GRADES
   const grades = schoolData?.school?.grades ?? [];

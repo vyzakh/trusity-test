@@ -3,12 +3,12 @@ import { Form } from "@heroui/form";
 import { SelectItem } from "@heroui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 
 import {
   CreateStudentSchema,
-  CreateStudentSchemaType,
-} from "../schemas/createStudentSchema";
+  type CreateStudentSchemaType,
+} from "../../schemas/createStudentSchema";
 
 import {
   Autocomplete,
@@ -18,9 +18,68 @@ import {
   PhoneInput,
   Select,
 } from "@/components/ui";
+import { handleApolloError } from "@/core/errors";
+import type { BusinessType } from "@/core/services/types";
+import { omitKeys } from "@/core/utils/object";
+import { SCHOOLS_QUERY } from "@/features/school/pages/schools/services/schoolQueries";
+import type { SchoolsQueryResponse } from "@/features/school/pages/schools/services/types";
 import { GuardianDetails } from "@/features/school/pages/students/components";
+import type { CreateB2BStudentSchemaType } from "@/features/school/pages/students/schemas/createB2BStudentSchema";
+import { CREATE_B2B_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
+import type { CreateB2BStudentResponse } from "@/features/school/pages/students/services/types";
+import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
+import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
+import { useMutation, useQuery } from "@apollo/client";
+import { addToast } from "@heroui/toast";
+import { parseDate } from "@internationalized/date";
+import { DateTime } from "luxon";
+import { useNavigate } from "react-router";
+import {
+  STUDENTS_QUERY,
+  TOTAL_STUDENTS_QUERY,
+} from "../../services/studentQueries";
+
+type CreateStudentInput = Omit<
+  CreateB2BStudentSchemaType,
+  "sectionId" | "gradeId"
+> & {
+  schoolSectionId: string;
+};
 
 export default function B2BStudentForm() {
+  const navigate = useNavigate();
+  const [sections, setSections] = React.useState<
+    { id: string; section: string }[]
+  >([]);
+
+  //LIST ALL B2B SCHOOLS QUERY
+  const { data: b2bSchools, loading: isLoadingSchools } = useQuery<
+    SchoolsQueryResponse,
+    { accountType: BusinessType }
+  >(SCHOOLS_QUERY, {
+    variables: { accountType: "B2B" },
+  });
+
+  //CREATE B2B STUDENT MUTATION
+  const [createStudent, { loading: isCreating }] = useMutation<
+    CreateB2BStudentResponse,
+    {
+      schoolId: string;
+      accountType: BusinessType;
+      input: CreateStudentInput;
+    }
+  >(CREATE_B2B_STUDENT_MUTATION, {
+    refetchQueries: [
+      {
+        query: STUDENTS_QUERY,
+        variables: { limit: 10, offset: 0 },
+      },
+      {
+        query: TOTAL_STUDENTS_QUERY,
+      },
+    ],
+  });
+
   //RHF CONFIG
   const methods = useForm<CreateStudentSchemaType>({
     resolver: zodResolver(CreateStudentSchema),
@@ -29,7 +88,7 @@ export default function B2BStudentForm() {
       email: "",
       gradeId: "",
       contactNumber: "",
-      dateOfBirth: undefined,
+      dateOfBirth: "",
       sectionId: "",
       guardian: {
         name: "",
@@ -39,29 +98,80 @@ export default function B2BStudentForm() {
     },
   });
 
+  //SELECTED SCHOOL ID
+  const selectedSchool = useWatch({
+    control: methods.control,
+    name: "schoolId",
+  });
+
+  //SELECTED GRADE ID
+  const selectedGrade = useWatch({ control: methods.control, name: "gradeId" });
+
+  //LIST ALL GRADES BY SCHOOL QUERY
+  const { data: schoolData, loading: isLoadingSchoolData } = useQuery<
+    GradesBySchoolQueryResponse,
+    { schoolId: string }
+  >(GRADES_BY_SCHOOL_QUERY, {
+    variables: { schoolId: selectedSchool },
+    skip: !selectedSchool,
+  });
+
+  //ALL SCHOOLS AND GRADES
+  const schools = b2bSchools?.schools || [];
+  const grades = schoolData?.school?.grades || [];
+
   // STUDENT CREATE HANDLER
   const handleCreateStudent = async (data: CreateStudentSchemaType) => {
-    // try {
-    //   const response = await createStudent({
-    //     variables: {
-    //       schoolId: schoolId!,
-    //       input: {
-    //         ...data,
-    //         sectionId: Number(data.sectionId),
-    //         gradeId: Number(data.gradeId),
-    //       },
-    //     },
-    //   });
-    //   addToast({
-    //     title: response?.data?.createB2BStudent?.message,
-    //     color: "danger",
-    //   });
-    //   handleCancel();
-    // } catch (error) {
-    //   const errMsg = handleApolloError(error);
-    //   addToast({ title: errMsg, color: "danger" });
-    // }
+    const rest = omitKeys(data, ["gradeId", "sectionId", "schoolId"]);
+
+    try {
+      const schoolGradeSectionId = schoolData?.school?.grades
+        ?.find((g) => g.id === data.gradeId)
+        ?.sections?.find((s) => s.id === data.sectionId)?.id;
+
+      const response = await createStudent({
+        variables: {
+          accountType: "B2B",
+          schoolId: data.schoolId,
+          input: {
+            ...rest,
+            schoolSectionId: schoolGradeSectionId!,
+          },
+        },
+      });
+
+      addToast({
+        title: response?.data?.createStudent?.message,
+        color: "success",
+      });
+      handleCancel();
+    } catch (error) {
+      const errMsg = handleApolloError(error);
+      addToast({ title: errMsg, color: "danger" });
+    }
   };
+
+  //FORM CANCEL HANDLER
+  const handleCancel = () => {
+    methods.reset();
+    navigate("..");
+  };
+
+  //SET SECTIONS BASED ON SELECTED GRADE
+  React.useEffect(() => {
+    if (!selectedGrade) return;
+
+    const selected = schoolData?.school?.grades?.find(
+      (g) => g.id === selectedGrade,
+    );
+
+    setSections(
+      selected?.sections.map((s) => ({
+        id: s.id,
+        section: s.section.section,
+      })) || [],
+    );
+  }, [selectedGrade, schoolData]);
 
   return (
     <React.Fragment>
@@ -124,7 +234,7 @@ export default function B2BStudentForm() {
             name="dateOfBirth"
             render={({ field, fieldState: { invalid, error } }) => (
               <DatePicker
-                // {...field}
+                {...field}
                 isRequired
                 showMonthAndYearPickers
                 classNames={{ inputWrapper: "shadow-none border-1" }}
@@ -132,21 +242,21 @@ export default function B2BStudentForm() {
                 isInvalid={invalid}
                 label="Date of Birth"
                 labelPlacement="outside"
-                // value={field?.value ? parseDate(field.value) : undefined}
+                value={field?.value !== "" ? parseDate(field.value) : null}
                 variant="bordered"
-                // onChange={(val) => {
-                //   if (val) {
-                //     const formatted = DateTime.fromObject({
-                //       year: val.year,
-                //       month: val.month,
-                //       day: val.day,
-                //     }).toFormat("yyyy-MM-dd");
+                onChange={(val) => {
+                  if (val) {
+                    const formatted = DateTime.fromObject({
+                      year: val.year,
+                      month: val.month,
+                      day: val.day,
+                    }).toFormat("yyyy-MM-dd");
 
-                //     field.onChange(formatted);
-                //   } else {
-                //     field.onChange(null);
-                //   }
-                // }}
+                    field.onChange(formatted);
+                  } else {
+                    field.onChange(null);
+                  }
+                }}
               />
             )}
           />
@@ -166,19 +276,22 @@ export default function B2BStudentForm() {
                     inputWrapper: "border-small shadow-none",
                   },
                 }}
-                // isDisabled={selectedGrade === ""}
+                isDisabled={isLoadingSchools}
                 isInvalid={invalid}
-                // items={sections}
-                label="School Name"
-                labelPlacement="outside"
+                items={schools}
+                label="School"
+                labelPlacement="outside-top"
                 name={field.name}
-                placeholder="Select"
                 selectedKey={field.value}
                 variant="bordered"
                 onBlur={field.onBlur}
                 onSelectionChange={(e) => field.onChange(e)}
               >
-                <AutocompleteItem key="1">1</AutocompleteItem>
+                {(school) => (
+                  <AutocompleteItem key={school.id} textValue={school.name}>
+                    {school.name}
+                  </AutocompleteItem>
+                )}
               </Autocomplete>
             )}
           />
@@ -192,13 +305,18 @@ export default function B2BStudentForm() {
                 isRequired
                 errorMessage={error?.message}
                 isInvalid={invalid}
-                // isLoading={isLoadingSchoolData}
+                isLoading={isLoadingSchoolData}
+                isDisabled={!selectedSchool}
                 label="Grade/Year"
                 labelPlacement="outside"
                 placeholder="Select"
                 variant="bordered"
               >
-                <SelectItem key="jjj">jjj</SelectItem>
+                {grades?.map((grade) => (
+                  <SelectItem key={grade.id} textValue={grade.grade.grade}>
+                    {grade.grade.grade}
+                  </SelectItem>
+                ))}
               </Select>
             )}
           />
@@ -215,9 +333,9 @@ export default function B2BStudentForm() {
                     inputWrapper: "border-small shadow-none",
                   },
                 }}
-                // isDisabled={selectedGrade === ""}
+                isDisabled={!selectedGrade}
                 isInvalid={invalid}
-                // items={sections}
+                items={sections}
                 label="Section"
                 labelPlacement="outside"
                 name={field.name}
@@ -227,7 +345,14 @@ export default function B2BStudentForm() {
                 onBlur={field.onBlur}
                 onSelectionChange={(e) => field.onChange(e)}
               >
-                <AutocompleteItem key="1">1</AutocompleteItem>
+                {(section) => (
+                  <AutocompleteItem
+                    key={section.id}
+                    textValue={section.section}
+                  >
+                    {section.section}
+                  </AutocompleteItem>
+                )}
               </Autocomplete>
             )}
           />
@@ -235,17 +360,17 @@ export default function B2BStudentForm() {
             <Button
               className="h-9"
               color="default"
-              // disabled={isCreating}
+              disabled={isCreating}
               type="reset"
               variant="flat"
-              // onPress={handleCancel}
+              onPress={handleCancel}
             >
               Cancel
             </Button>
             <Button
               className="h-9"
               color="primary"
-              // isLoading={isCreating}
+              isLoading={isCreating}
               type="submit"
             >
               Save

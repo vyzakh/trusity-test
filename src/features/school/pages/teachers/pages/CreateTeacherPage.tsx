@@ -1,4 +1,4 @@
-import { useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Form } from "@heroui/form";
 import {
   TableBody,
@@ -8,7 +8,6 @@ import {
   TableRow,
 } from "@heroui/table";
 import { addToast } from "@heroui/toast";
-import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -36,6 +35,10 @@ import {
 import { handleApolloError } from "@/core/errors";
 import { omitKeys } from "@/core/utils/object";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
+import {
+  TEACHERS_QUERY,
+  TOTAL_TEACHERS_QUERY,
+} from "@/features/teachers/services/teachersQuery";
 import type { CreateTeacherResponse } from "../services/types";
 
 const gradesTableColumns = [
@@ -57,17 +60,18 @@ type CreateTeacherPayload = {
 export default function CreateTeacherPage() {
   const navigate = useNavigate();
   const { schoolId } = useParams<{ schoolId: string }>();
-  const client = useApolloClient();
 
   const [createTeacher, { loading: isCreatingTeacher }] = useMutation<
     CreateTeacherResponse,
     CreateTeacherPayload
   >(CREATE_TEACHER_MUTATION, {
-    onCompleted: () => {
-      client.cache.evict({ fieldName: "teachers" });
-      client.cache.evict({ fieldName: "totalTeachers" });
-      client.cache.gc();
-    },
+    refetchQueries: [
+      { query: TEACHERS_QUERY, variables: { limit: 10, offset: 0, schoolId } },
+      {
+        query: TOTAL_TEACHERS_QUERY,
+        variables: { schoolId },
+      },
+    ],
   });
 
   //LIST ALL GRADES BY SCHOOL QUERY
@@ -311,7 +315,6 @@ export default function CreateTeacherPage() {
           >
             Save
           </Button>
-          <DevTool control={control} />
         </div>
       </FormWrapper>
     </PageWrapper>

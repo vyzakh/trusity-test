@@ -12,7 +12,7 @@ import { twMerge } from "tailwind-merge";
 
 import { STUDENTS_QUERY } from "../services/studentQueries";
 
-import { SearchIcon } from "@/components";
+import { PageWrapper, SearchIcon } from "@/components";
 import { title } from "@/components/primitives";
 import { Button, Input } from "@/components/ui";
 import Pagination from "@/components/ui/pagination";
@@ -45,13 +45,16 @@ export default function StudentsPage() {
   const loadingState = loading ? "loading" : "idle";
 
   return (
-    <section className="flex flex-col gap-5">
-      <div className="mb-10 flex items-center justify-between">
-        <h1 className={title({ size: "lg" })}>Students</h1>
-        <Button as={Link} color="secondary" to="create">
-          Add Student
-        </Button>
-      </div>
+    <PageWrapper
+      slots={{
+        title: "Students",
+        actions: [
+          <Button as={Link} color="secondary" to="create">
+            Add Student
+          </Button>,
+        ],
+      }}
+    >
       <Table
         aria-label="Schools table"
         bottomContent={<Pagination totalCount={100} />}
@@ -111,7 +114,14 @@ export default function StudentsPage() {
 
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center">
-                    <Button isIconOnly radius="full" size="sm" variant="light">
+                    <Button
+                      isIconOnly
+                      radius="full"
+                      size="sm"
+                      variant="light"
+                      as={Link}
+                      to={`${student.id}/update`}
+                    >
                       <svg
                         fill="none"
                         height="16"
@@ -142,7 +152,7 @@ export default function StudentsPage() {
           })}
         </TableBody>
       </Table>
-    </section>
+    </PageWrapper>
   );
 }
 

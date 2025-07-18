@@ -22,6 +22,7 @@ import { TEACHERS_QUERY } from "@/features/teachers/services/teachersQuery";
 import type {
   TeachersQueryInput,
   TeachersQueryResponse,
+  TotalTeachersQueryResponse,
 } from "@/features/teachers/services/types";
 import TopContent from "../components/TopContent";
 
@@ -49,11 +50,20 @@ export default function TeacherPage() {
       schoolId: schoolId,
       ...(debouncedName && { name: debouncedName }),
     },
-    returnPartialData: true,
+  });
+
+  const { data: total } = useQuery<
+    TotalTeachersQueryResponse,
+    TeachersQueryInput
+  >(TEACHERS_QUERY, {
+    variables: {
+      schoolId: schoolId,
+      ...(debouncedName && { name: debouncedName }),
+    },
   });
 
   const teachers = teachersData?.teachers || [];
-  const totalTeachers = teachersData?.totalTeachers || 0;
+  const totalTeachers = total?.totalTeachers || 0;
 
   //TABLE LOADING STATE
   const loadingState = loading ? "loading" : "idle";

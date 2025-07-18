@@ -1,20 +1,21 @@
-import { Link } from "react-router";
-
+import { Button } from "@/components/ui";
 import { IECCard, SchoolsTable } from "../components";
 
 import { DasboardCard, PageWrapper } from "@/components";
-import { title } from "@/components/primitives";
-import { Button } from "@/components/ui";
+import { Link } from "react-router";
 
 export default function SchoolsPage() {
   return (
-    <PageWrapper>
-      <div className="flex items-center justify-between">
-        <h1 className={title({ size: "lg" })}>Schools</h1>
-        <Button as={Link} color="secondary" to="create">
-          Add School
-        </Button>
-      </div>
+    <PageWrapper
+      slots={{
+        title: "Schools",
+        actions: [
+          <Button as={Link} color="secondary" to="create">
+            Add School
+          </Button>,
+        ],
+      }}
+    >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <DasboardCard
           color="#C0718D"

@@ -1,4 +1,4 @@
-import { useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { AutocompleteItem } from "@heroui/autocomplete";
 import { Form } from "@heroui/form";
 import { SelectItem } from "@heroui/select";
@@ -33,7 +33,10 @@ import type { BusinessType } from "@/core/services/types";
 import { omitKeys } from "@/core/utils/object";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
-import { STUDENT_QUERY } from "@/features/students/services/studentQueries";
+import {
+  STUDENT_QUERY,
+  STUDENTS_QUERY,
+} from "@/features/students/services/studentQueries";
 import type { StudentQueryResponse } from "@/features/students/services/types";
 import type { CreateB2BStudentResponse } from "../services/types";
 
@@ -48,7 +51,6 @@ type UpdateteStudentInput = Omit<
 
 export default function UpdateStudentPage() {
   const { studentId, schoolId } = useParams();
-  const client = useApolloClient();
   const navigate = useNavigate();
   const [sections, setSections] = React.useState<
     { id: string; section: string }[]
@@ -80,11 +82,12 @@ export default function UpdateStudentPage() {
       input: UpdateteStudentInput;
     }
   >(UPDATE_B2B_STUDENT_MUTATION, {
-    onCompleted: () => {
-      client.cache.evict({ fieldName: "students" });
-      client.cache.evict({ fieldName: "totalStudents" });
-      client.cache.gc();
-    },
+    refetchQueries: [
+      {
+        query: STUDENTS_QUERY,
+        variables: { limit: 10, offset: 0, schoolId },
+      },
+    ],
   });
 
   //RHF CONFIG

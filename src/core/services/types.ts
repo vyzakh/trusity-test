@@ -21,10 +21,13 @@ export type UploadFilePayload = {
 
 export type FileType = "USER_AVATAR" | "SCHOOL_LOGO";
 
-export type MutationResponse<T extends string> = {
+export type MutationResponse<
+  T extends string,
+  Payload = Record<string, unknown>,
+> = {
   [K in T]: {
     message: string;
-  };
+  } & Payload;
 };
 
 export type PaginationInput = {

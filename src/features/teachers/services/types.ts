@@ -1,5 +1,5 @@
-import { PaginationInput } from "@/core/services/types";
-import { Grade, Section } from "@/features/school/services/types";
+import type { PaginationInput } from "@/core/services/types";
+import type { Grade, Section } from "@/features/school/services/types";
 
 export type TeachersQueryResponse = {
   teachers: {
@@ -20,4 +20,8 @@ export type TeachersQueryResponse = {
 export type TeachersQueryInput = PaginationInput & {
   name?: string;
   schoolId?: string;
+};
+
+export type TotalTeachersQueryResponse = {
+  totalTeachers: number;
 };

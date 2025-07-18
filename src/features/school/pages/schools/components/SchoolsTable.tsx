@@ -9,23 +9,25 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { Tab, Tabs } from "@heroui/tabs";
 import { useQueryState } from "nuqs";
 import { Link } from "react-router";
 import { twMerge } from "tailwind-merge";
 import { useDebounce } from "use-debounce";
 import { z } from "zod";
 
-import { SCHOOLS_QUERY } from "../services/schoolQueries";
+import { SCHOOLS_QUERY, TOTAL_SCHOOLS_QUERY } from "../services/schoolQueries";
 
-import { SearchIcon } from "@/components";
-import { Button, Input } from "@/components/ui";
+import { Button } from "@/components/ui";
 import Pagination from "@/components/ui/pagination";
 import { DEFAULT_ROW_STYLES, Table } from "@/components/ui/table";
 import { usePagination } from "@/core/hooks/usePagination";
-import type { PaginationInput } from "@/core/services/types";
 import { getSerialNumber } from "@/core/utils/pagination";
-import type { SchoolsQueryResponse } from "../services/types";
+import type {
+  SchoolsInput,
+  SchoolsQueryResponse,
+  TotalSchoolsQueryResponse,
+} from "../services/types";
+import TopContent from "./TopContent";
 
 const columns = [
   { name: "S.No", uid: "id" },
@@ -39,10 +41,6 @@ const columns = [
   { name: "Completed", uid: "e" },
   { name: "Action", uid: "action" },
 ];
-
-type SchoolsInput = PaginationInput & {
-  name?: string | null;
-};
 
 export default function SchoolsTable() {
   const { limit, offset, page, updateSearchParams } = usePagination();
@@ -58,12 +56,21 @@ export default function SchoolsTable() {
         offset,
         ...(debouncedName && { name: debouncedName }),
       },
-      returnPartialData: true,
+    },
+  );
+
+  //TOTAL SCHOOLS QUERY
+  const { data: total } = useQuery<TotalSchoolsQueryResponse, SchoolsInput>(
+    TOTAL_SCHOOLS_QUERY,
+    {
+      variables: {
+        ...(debouncedName && { name: debouncedName }),
+      },
     },
   );
 
   const schools = data?.schools || [];
-  const totalSchools = data?.totalSchools || 0;
+  const totalSchools = total?.totalSchools || 0;
 
   //SEARCH HANDLER
   const handleSearch = (value: string) => {
@@ -213,68 +220,3 @@ export default function SchoolsTable() {
     </Table>
   );
 }
-
-export const TopContent = ({
-  handleClear,
-  handleSearch,
-  value,
-}: {
-  handleSearch: (val: string) => void;
-  handleClear: () => void;
-  value: string | null;
-}) => {
-  return (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-4">
-        <Tabs
-          aria-label="School status"
-          classNames={{
-            tabList: "bg-white",
-            tab: "px-3",
-          }}
-          color="primary"
-          radius="full"
-        >
-          <Tab key="all" title="All" />
-          <Tab key="active" title="Active Schools" />
-          <Tab key="inactive" title="Inactive Schools" />
-        </Tabs>
-
-        <Input
-          className="ms-auto max-w-xs min-w-44"
-          classNames={{
-            inputWrapper:
-              "group-data-[hover=true]:bg-white group-data-[focus=true]:bg-white shadow-none bg-[#BFBFBF33] ",
-          }}
-          placeholder="Search school name"
-          radius="full"
-          startContent={<SearchIcon />}
-          value={value ?? ""}
-          onClear={handleClear}
-          onValueChange={handleSearch}
-        />
-        <Button
-          className={twMerge("bg-white")}
-          endContent={
-            <svg
-              fill="none"
-              height="16"
-              viewBox="0 0 16 16"
-              width="16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12.5 8C12.5 8.13261 12.4473 8.25979 12.3536 8.35355C12.2598 8.44732 12.1326 8.5 12 8.5H4C3.86739 8.5 3.74021 8.44732 3.64645 8.35355C3.55268 8.25979 3.5 8.13261 3.5 8C3.5 7.86739 3.55268 7.74021 3.64645 7.64645C3.74021 7.55268 3.86739 7.5 4 7.5H12C12.1326 7.5 12.2598 7.55268 12.3536 7.64645C12.4473 7.74021 12.5 7.86739 12.5 8ZM14.5 4.5H1.5C1.36739 4.5 1.24021 4.55268 1.14645 4.64645C1.05268 4.74021 1 4.86739 1 5C1 5.13261 1.05268 5.25979 1.14645 5.35355C1.24021 5.44732 1.36739 5.5 1.5 5.5H14.5C14.6326 5.5 14.7598 5.44732 14.8536 5.35355C14.9473 5.25979 15 5.13261 15 5C15 4.86739 14.9473 4.74021 14.8536 4.64645C14.7598 4.55268 14.6326 4.5 14.5 4.5ZM9.5 10.5H6.5C6.36739 10.5 6.24021 10.5527 6.14645 10.6464C6.05268 10.7402 6 10.8674 6 11C6 11.1326 6.05268 11.2598 6.14645 11.3536C6.24021 11.4473 6.36739 11.5 6.5 11.5H9.5C9.63261 11.5 9.75979 11.4473 9.85355 11.3536C9.94732 11.2598 10 11.1326 10 11C10 10.8674 9.94732 10.7402 9.85355 10.6464C9.75979 10.5527 9.63261 10.5 9.5 10.5Z"
-                fill="currentColor"
-              />
-            </svg>
-          }
-          radius="full"
-          variant="bordered"
-        >
-          Filter
-        </Button>
-      </div>
-    </div>
-  );
-};

@@ -30,7 +30,7 @@ export type StudentQueryResponse = {
     name: string;
     email: string;
     dateOfBirth: string;
-    accountType: string;
+    accountType: BusinessType;
     contactNumber: string;
     guardian: {
       name: string;

@@ -14,6 +14,7 @@ import {
   DashboardPage,
   GlobalCreateStudentPage,
   GlobalStudentsPage,
+  GlobalUpdateStudentPage,
   GradesPage,
   SchoolsPage,
   StudentsPage,
@@ -144,6 +145,10 @@ const privateRoutes: RouteObject[] = [
             children: [
               { index: true, element: <GlobalStudentsPage /> },
               { path: "create", element: <GlobalCreateStudentPage /> },
+              {
+                path: ":studentId/update",
+                element: <GlobalUpdateStudentPage />,
+              },
             ],
           },
 

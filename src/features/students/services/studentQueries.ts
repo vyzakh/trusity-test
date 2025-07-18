@@ -49,7 +49,24 @@ export const STUDENTS_QUERY = gql`
         }
       }
     }
-    totalStudents(name: $name)
+  }
+`;
+
+export const TOTAL_STUDENTS_QUERY = gql`
+  query TotalStudents(
+    $schoolId: String
+    $teacherId: String
+    $schoolSectionId: String
+    $schoolGradeId: String
+    $name: String
+  ) {
+    totalStudents(
+      name: $name
+      schoolId: $schoolId
+      teacherId: $teacherId
+      schoolGradeId: $schoolGradeId
+      schoolSectionId: $schoolSectionId
+    )
   }
 `;
 

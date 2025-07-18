@@ -138,6 +138,7 @@ export default function UpdateGradePage() {
   };
 
   React.useEffect(() => {
+    console.log("pppp");
     if (createdGrades.length > 0) {
       const currentGrade = createdGrades?.find(
         (grade) => grade.id === schoolGradeId,

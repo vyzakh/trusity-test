@@ -36,14 +36,12 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   // const state = store.getState();
-  // const tenantKey = state.auth?.tenant?.tenantKey;
   // const accessToken = state.auth?.accessToken;
 
   return {
     headers: {
       ...headers,
       "Content-Type": "application/json",
-      // ...(tenantKey && { "x-tenant-id": tenantKey }),
       // ...(accessToken && { "x-auth-token": accessToken }),
     },
   };
@@ -51,16 +49,5 @@ const authLink = setContext((_, { headers }) => {
 
 export const client = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
-  cache: new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          school: {
-            keyArgs: ["schoolId"],
-            merge: true,
-          },
-        },
-      },
-    },
-  }),
+  cache: new InMemoryCache(),
 });

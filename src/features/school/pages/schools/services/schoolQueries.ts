@@ -39,8 +39,18 @@ export const CURRICULUMS_QUERY = gql`
 `;
 
 export const SCHOOLS_QUERY = gql`
-  query Schools($name: String, $limit: Int, $offset: Int) {
-    schools(name: $name, limit: $limit, offset: $offset) {
+  query Schools(
+    $name: String
+    $limit: Int
+    $offset: Int
+    $accountType: BusinessModel
+  ) {
+    schools(
+      name: $name
+      limit: $limit
+      offset: $offset
+      accountType: $accountType
+    ) {
       id
       name
       logoUrl
@@ -51,13 +61,12 @@ export const SCHOOLS_QUERY = gql`
         totalLicense
       }
     }
-    totalSchools(name: $name)
   }
 `;
 
 export const TOTAL_SCHOOLS_QUERY = gql`
-  query TotalSchools($name: String) {
-    totalSchools(name: $name)
+  query TotalSchools($name: String, $accountType: BusinessModel) {
+    totalSchools(name: $name, accountType: $accountType)
   }
 `;
 
