@@ -1,8 +1,8 @@
-import { FormWrapper, PageWrapper } from "@/components";
+import { FormSkeleton, FormWrapper, PageWrapper } from "@/components";
 import { BreadcrumbNav } from "@/components/ui";
 import { useQuery } from "@apollo/client";
 import { useParams } from "react-router";
-import B2BStudentForm from "../components/CreateStudent/B2CStudentForm";
+import { B2BStudentForm, B2CStudentForm } from "../components/UpdateStudent";
 import { STUDENT_QUERY } from "../services/studentQueries";
 import type { StudentQueryResponse } from "../services/types";
 
@@ -23,7 +23,7 @@ export default function UpdateStudentPage() {
         breadcrumb: (
           <BreadcrumbNav
             items={[
-              { label: "Students", to: "../.." },
+              { label: "Students", to: ".." },
               { label: studentData?.name, isLoading: loading },
             ]}
           />
@@ -31,10 +31,14 @@ export default function UpdateStudentPage() {
       }}
     >
       <FormWrapper>
-        {studentData?.accountType === "B2C" ? (
-          <B2BStudentForm />
+        {loading ? (
+          <FormSkeleton />
+        ) : studentData?.accountType === "B2B" ? (
+          <B2BStudentForm studentData={studentData} />
         ) : (
-          <B2BStudentForm />
+          studentData?.accountType === "B2C" && (
+            <B2CStudentForm studentData={studentData} />
+          )
         )}
       </FormWrapper>
     </PageWrapper>

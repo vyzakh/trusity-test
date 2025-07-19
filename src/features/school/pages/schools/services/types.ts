@@ -9,10 +9,16 @@ export type BaseEntity = {
   name: string;
 };
 
+export type NumericEntity = {
+  id: number;
+  name: string;
+};
+
 export type Country = BaseEntity & {
   emoji: string;
 };
 
+// List response types
 export type CountryListResponse = {
   countries: Country[];
 };
@@ -26,27 +32,40 @@ export type CityListResponse = {
 };
 
 export type CurriculumListResponse = {
-  curriculums: (Omit<BaseEntity, "id"> & {
-    id: number;
+  curriculums: (NumericEntity & {
     allowCustom: boolean;
   })[];
 };
 
+// Common address components
+type BaseLocation = {
+  id: number;
+  name: string;
+};
+
+type SimpleLocation = {
+  name: string;
+};
+
+// Address types
 export type Address = {
   streetAddressLine1: string;
   streetAddressLine2?: string;
   postalCode?: string;
   contactNumber?: string;
-  city: {
-    id: string;
-    name: string;
-  };
-  state: {
-    name: string;
-  };
-  country: {
-    name: string;
-  };
+  city: Pick<BaseEntity, "id" | "name">;
+  state: SimpleLocation;
+  country: SimpleLocation;
+};
+
+export type DetailedAddress = {
+  country: BaseLocation;
+  city: BaseLocation;
+  state: BaseLocation;
+  postalCode: string;
+  streetAddressLine1: string;
+  streetAddressLine2: string;
+  contactNumber: string;
 };
 
 export type Contact = {
@@ -62,20 +81,48 @@ export type Curriculum = {
   otherName?: string;
 };
 
+export type DetailedCurriculum = {
+  id: number;
+  name: string;
+  otherName: string;
+  allowCustom: boolean;
+};
+
 export type License = {
   usedLicense: number;
   totalLicense: number;
 };
 
-export type School = {
+export type SimpleLicense = {
+  totalLicense: number;
+};
+
+export type BasicSchool = {
   id: string;
   name: string;
+};
+
+export type School = BasicSchool & {
   accountType: string;
   logoUrl: string;
   address: Address;
   contact: Contact;
   curriculums: Curriculum[];
   license: License;
+  stats: {
+    totalTeachers: number;
+    totalStudents: number;
+  };
+};
+
+export type SchoolDetails = {
+  name: string;
+  logoUrl: string;
+  accountType: BusinessType;
+  address: DetailedAddress;
+  contact: Contact;
+  license: SimpleLicense;
+  curriculums: DetailedCurriculum[];
 };
 
 export type SchoolsQueryResponse = {
@@ -83,86 +130,50 @@ export type SchoolsQueryResponse = {
   totalSchools: number;
 };
 
-export type SchoolQueryResponse = {
-  school: {
-    name: string;
-    logoUrl: string;
-    accountType: string;
-    address: {
-      country: {
-        id: number;
-        name: string;
-      };
-      city: {
-        id: number;
-        name: string;
-      };
-      state: {
-        id: number;
-        name: string;
-      };
-      postalCode: string;
-      streetAddressLine1: string;
-      streetAddressLine2: string;
-      contactNumber: string;
-    };
-    contact: {
-      name: string;
-      email: string;
-      contactNumber: string;
-    };
-    license: {
-      totalLicense: number;
-    };
-    curriculums: {
-      id: number;
-      name: string;
-      otherName: string;
-      allowCustom: boolean;
-    }[];
-  };
+export type SchoolNamesQueryResponse = {
+  schools: BasicSchool[];
 };
 
-export type TotalSchoolsQueryResponse = { totalSchools: number };
+export type SchoolQueryResponse = {
+  school: SchoolDetails;
+};
 
-///MUTATION PAYLOAD AND RESPONSE
+export type TotalSchoolsQueryResponse = {
+  totalSchools: number;
+};
 
-export type CreateSchoolPayload = {
+type AddressPayload = {
+  streetAddressLine1: string;
+  streetAddressLine2: string | null;
+  cityId: string;
+  stateId: string;
+  countryId: string;
+  postalCode: string;
+};
+
+type DetailedAddressPayload = AddressPayload & {
+  contactNumber: string;
+};
+
+type CurriculumPayload = {
+  id: number | null;
+  name: string | null;
+};
+
+export type CreateB2BSchoolPayload = {
   accountType: BusinessType;
   name: string;
   logoUrl: string;
   totalLicense: number;
-  address: {
-    streetAddressLine1: string;
-    streetAddressLine2: string | null;
-    cityId: string;
-    stateId: string;
-    countryId: string;
-    postalCode: string;
-    contactNumber: string;
-  };
-  contact: {
-    name: string;
-    email: string;
-    contactNumber: string;
-  };
-  curriculums: {
-    id: number | null;
-    name: string | null;
-  }[];
+  address: DetailedAddressPayload;
+  contact: Contact;
+  curriculums: CurriculumPayload[];
 };
 
 export type CreateB2CSchoolPayload = {
-  accountType: BusinessType;
   name: string;
-  address: {
-    streetAddressLine1: string;
-    streetAddressLine2: string | null;
-    cityId: string;
-    stateId: string;
-    countryId: string;
-    postalCode: string;
-  };
+  accountType: BusinessType;
+  address: AddressPayload;
 };
 
 export type SchoolsInput = PaginationInput & {
@@ -174,4 +185,5 @@ export type CreateSchoolResponse = MutationResponse<
   "createSchool",
   { school: { id: string } }
 >;
+
 export type UpdateSchoolResponse = MutationResponse<"updateSchool">;

@@ -18,7 +18,7 @@ import { BreadcrumbNav, Button } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import { SCHOOLS_QUERY, TOTAL_SCHOOLS_QUERY } from "../services/schoolQueries";
 import type {
-  CreateSchoolPayload,
+  CreateB2BSchoolPayload,
   CreateSchoolResponse,
 } from "../services/types";
 
@@ -28,7 +28,7 @@ export default function CreateSchoolPage() {
   //CREATE SCHOOL MUTATION
   const [createSchool, { loading: isCreating }] = useMutation<
     CreateSchoolResponse,
-    { input: CreateSchoolPayload }
+    { input: CreateB2BSchoolPayload }
   >(CREATE_SCHOOL_MUTATION, {
     refetchQueries: [
       { query: SCHOOLS_QUERY, variables: { limit: 10, offset: 0 } },
@@ -45,7 +45,7 @@ export default function CreateSchoolPage() {
 
   //SCHOOL CREATE HANDLER
   const handleCreateSchool = async (data: CreateSchoolSchemaType) => {
-    const { logo, curriculums, customCurriculum, totalLicense, ...rest } = data;
+    const { logo, curriculums, customCurriculum, ...rest } = data;
 
     const formattedCurriculums = curriculums?.map((c) => {
       if (c.allowCustom) {
@@ -62,7 +62,6 @@ export default function CreateSchoolPage() {
             ...rest,
             curriculums: formattedCurriculums,
             logoUrl: logo,
-            totalLicense: parseInt(totalLicense),
             accountType: "B2B",
           },
         },

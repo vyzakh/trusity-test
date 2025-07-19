@@ -1,30 +1,17 @@
-import { AutocompleteItem } from "@heroui/autocomplete";
 import { Form } from "@heroui/form";
-import { SelectItem } from "@heroui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 
 import {
-  CreateStudentSchema,
-  type CreateStudentSchemaType,
-} from "../../schemas/createStudentSchema";
+  CreateB2BStudentSchema,
+  type CreateB2BStudentSchemaType,
+} from "../../schemas/studentSchema";
 
-import {
-  Autocomplete,
-  Button,
-  DatePicker,
-  Input,
-  PhoneInput,
-  Select,
-} from "@/components/ui";
+import { Button, DatePicker, Input, PhoneInput } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import type { BusinessType } from "@/core/services/types";
 import { omitKeys } from "@/core/utils/object";
-import { SCHOOLS_QUERY } from "@/features/school/pages/schools/services/schoolQueries";
-import type { SchoolsQueryResponse } from "@/features/school/pages/schools/services/types";
-import { GuardianDetails } from "@/features/school/pages/students/components";
-import type { CreateB2BStudentSchemaType } from "@/features/school/pages/students/schemas/createB2BStudentSchema";
 import { CREATE_B2B_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
 import type { CreateB2BStudentResponse } from "@/features/school/pages/students/services/types";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
@@ -38,27 +25,18 @@ import {
   STUDENTS_QUERY,
   TOTAL_STUDENTS_QUERY,
 } from "../../services/studentQueries";
+import GuardianDetails from "../GuardianDetails";
+import SchoolInfo from "../SchoolInfo";
 
 type CreateStudentInput = Omit<
   CreateB2BStudentSchemaType,
-  "sectionId" | "gradeId"
+  "sectionId" | "gradeId" | "schoolId"
 > & {
   schoolSectionId: string;
 };
 
 export default function B2BStudentForm() {
   const navigate = useNavigate();
-  const [sections, setSections] = React.useState<
-    { id: string; section: string }[]
-  >([]);
-
-  //LIST ALL B2B SCHOOLS QUERY
-  const { data: b2bSchools, loading: isLoadingSchools } = useQuery<
-    SchoolsQueryResponse,
-    { accountType: BusinessType }
-  >(SCHOOLS_QUERY, {
-    variables: { accountType: "B2B" },
-  });
 
   //CREATE B2B STUDENT MUTATION
   const [createStudent, { loading: isCreating }] = useMutation<
@@ -81,14 +59,15 @@ export default function B2BStudentForm() {
   });
 
   //RHF CONFIG
-  const methods = useForm<CreateStudentSchemaType>({
-    resolver: zodResolver(CreateStudentSchema),
+  const methods = useForm<CreateB2BStudentSchemaType>({
+    resolver: zodResolver(CreateB2BStudentSchema),
     defaultValues: {
       name: "",
       email: "",
-      gradeId: "",
       contactNumber: "",
       dateOfBirth: "",
+      schoolId: "",
+      gradeId: "",
       sectionId: "",
       guardian: {
         name: "",
@@ -104,9 +83,6 @@ export default function B2BStudentForm() {
     name: "schoolId",
   });
 
-  //SELECTED GRADE ID
-  const selectedGrade = useWatch({ control: methods.control, name: "gradeId" });
-
   //LIST ALL GRADES BY SCHOOL QUERY
   const { data: schoolData, loading: isLoadingSchoolData } = useQuery<
     GradesBySchoolQueryResponse,
@@ -116,12 +92,8 @@ export default function B2BStudentForm() {
     skip: !selectedSchool,
   });
 
-  //ALL SCHOOLS AND GRADES
-  const schools = b2bSchools?.schools || [];
-  const grades = schoolData?.school?.grades || [];
-
   // STUDENT CREATE HANDLER
-  const handleCreateStudent = async (data: CreateStudentSchemaType) => {
+  const handleCreateStudent = async (data: CreateB2BStudentSchemaType) => {
     const rest = omitKeys(data, ["gradeId", "sectionId", "schoolId"]);
 
     try {
@@ -156,22 +128,6 @@ export default function B2BStudentForm() {
     methods.reset();
     navigate("..");
   };
-
-  //SET SECTIONS BASED ON SELECTED GRADE
-  React.useEffect(() => {
-    if (!selectedGrade) return;
-
-    const selected = schoolData?.school?.grades?.find(
-      (g) => g.id === selectedGrade,
-    );
-
-    setSections(
-      selected?.sections.map((s) => ({
-        id: s.id,
-        section: s.section.section,
-      })) || [],
-    );
-  }, [selectedGrade, schoolData]);
 
   return (
     <React.Fragment>
@@ -264,97 +220,9 @@ export default function B2BStudentForm() {
           {/* GUARDIANS DETAILS */}
           <GuardianDetails />
 
-          <Controller
-            control={methods.control}
-            name="schoolId"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <Autocomplete
-                isRequired
-                errorMessage={error?.message}
-                inputProps={{
-                  classNames: {
-                    inputWrapper: "border-small shadow-none",
-                  },
-                }}
-                isDisabled={isLoadingSchools}
-                isInvalid={invalid}
-                items={schools}
-                label="School"
-                labelPlacement="outside-top"
-                name={field.name}
-                selectedKey={field.value}
-                variant="bordered"
-                onBlur={field.onBlur}
-                onSelectionChange={(e) => field.onChange(e)}
-              >
-                {(school) => (
-                  <AutocompleteItem key={school.id} textValue={school.name}>
-                    {school.name}
-                  </AutocompleteItem>
-                )}
-              </Autocomplete>
-            )}
-          />
-
-          <Controller
-            control={methods.control}
-            name="gradeId"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <Select
-                {...field}
-                isRequired
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                isLoading={isLoadingSchoolData}
-                isDisabled={!selectedSchool}
-                label="Grade/Year"
-                labelPlacement="outside"
-                placeholder="Select"
-                variant="bordered"
-              >
-                {grades?.map((grade) => (
-                  <SelectItem key={grade.id} textValue={grade.grade.grade}>
-                    {grade.grade.grade}
-                  </SelectItem>
-                ))}
-              </Select>
-            )}
-          />
-
-          <Controller
-            control={methods.control}
-            name="sectionId"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <Autocomplete
-                isRequired
-                errorMessage={error?.message}
-                inputProps={{
-                  classNames: {
-                    inputWrapper: "border-small shadow-none",
-                  },
-                }}
-                isDisabled={!selectedGrade}
-                isInvalid={invalid}
-                items={sections}
-                label="Section"
-                labelPlacement="outside"
-                name={field.name}
-                placeholder="Select"
-                selectedKey={field.value}
-                variant="bordered"
-                onBlur={field.onBlur}
-                onSelectionChange={(e) => field.onChange(e)}
-              >
-                {(section) => (
-                  <AutocompleteItem
-                    key={section.id}
-                    textValue={section.section}
-                  >
-                    {section.section}
-                  </AutocompleteItem>
-                )}
-              </Autocomplete>
-            )}
+          <SchoolInfo
+            schoolData={schoolData?.school}
+            isLoading={isLoadingSchoolData}
           />
           <div className="flex w-full items-center justify-end gap-2">
             <Button

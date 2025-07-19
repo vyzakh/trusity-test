@@ -7,7 +7,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import {
   CreateB2CStudentSchema,
   type CreateB2CStudentSchemaType,
-} from "../../schemas/createStudentSchema";
+} from "../../schemas/studentSchema";
 
 import {
   Autocomplete,
@@ -30,7 +30,6 @@ import type {
   CreateSchoolResponse,
   SchoolsQueryResponse,
 } from "@/features/school/pages/schools/services/types";
-import { GuardianDetails } from "@/features/school/pages/students/components";
 import { CREATE_B2B_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
 import type { CreateB2BStudentResponse } from "@/features/school/pages/students/services/types";
 import { useMutation, useQuery } from "@apollo/client";
@@ -44,6 +43,7 @@ import {
   TOTAL_STUDENTS_QUERY,
 } from "../../services/studentQueries";
 import CreateB2CSchoolForm from "../CreateB2CSchoolForm";
+import GuardianDetails from "../GuardianDetails";
 
 type CreateStudentInput = Omit<CreateB2CStudentSchemaType, "schoolId">;
 
@@ -109,7 +109,7 @@ export default function B2BStudentForm() {
     },
   });
 
-  //ALL SCHOOLS AND GRADES
+  //ALL SCHOOLS
   const schools = b2cSchools?.schools || [];
 
   // STUDENT CREATE HANDLER
@@ -297,8 +297,8 @@ export default function B2BStudentForm() {
               variant="light"
               disableRipple
               size="sm"
-              className="absolute top-0 right-0 z-10 h-auto min-h-auto p-0 hover:underline data-[hover=true]:bg-transparent"
-              color="warning"
+              className="absolute top-0 right-0 z-10 h-auto min-h-auto p-0 underline data-[hover=true]:bg-transparent"
+              color="primary"
               onPress={() => setOpenModal(true)}
             >
               Create a new school
@@ -362,20 +362,19 @@ export default function B2BStudentForm() {
         isOpen={openModal}
         scrollBehavior="inside"
         onClose={handleCloseModal}
+        hideCloseButton={isCreatingSchool}
+        isDismissable={!isCreatingSchool}
+        isKeyboardDismissDisabled={isCreatingSchool}
       >
         <ModalContent>
-          {() => (
-            <>
-              <ModalHeader className="text-2xl">Create School</ModalHeader>
-              <ModalBody className="pb-5">
-                <CreateB2CSchoolForm
-                  handleCancel={handleCloseModal}
-                  handleCreateSchool={handleCreateSchool}
-                  isCreatingSchool={isCreatingSchool}
-                />
-              </ModalBody>
-            </>
-          )}
+          <ModalHeader className="text-2xl">Create School</ModalHeader>
+          <ModalBody className="pb-5">
+            <CreateB2CSchoolForm
+              handleCancel={handleCloseModal}
+              handleCreateSchool={handleCreateSchool}
+              isCreatingSchool={isCreatingSchool}
+            />
+          </ModalBody>
         </ModalContent>
       </Modal>
     </React.Fragment>

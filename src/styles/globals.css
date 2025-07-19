@@ -168,8 +168,7 @@ body,
 }
 
 @utility container {
-  @apply mx-auto px-4;
-  max-width: 100%;
+  @apply mx-auto max-w-full px-4;
 
   @media (min-width: 640px) {
     max-width: 640px;
@@ -195,5 +194,49 @@ body,
     max-width: 1536px;
     padding-left: 2rem;
     padding-right: 2rem;
+  }
+}
+
+@utility action-btn {
+  @apply data-[hover=true]:!bg-default/20;
+}
+
+@utility animate-bell-ring {
+  animation: bell-ring 3.8s ease-in-out infinite;
+}
+
+@keyframes bell-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  2.6% {
+    transform: rotate(15deg);
+  }
+  5.3% {
+    transform: rotate(-10deg);
+  }
+  7.9% {
+    transform: rotate(10deg);
+  }
+  10.5% {
+    transform: rotate(-8deg);
+  }
+  13.2% {
+    transform: rotate(6deg);
+  }
+  15.8% {
+    transform: rotate(-4deg);
+  }
+  18.4% {
+    transform: rotate(2deg);
+  }
+  21.1% {
+    transform: rotate(-1deg);
+  }
+  21.1% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(0deg);
   }
 }

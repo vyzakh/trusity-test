@@ -1,20 +1,8 @@
 import type { PaginationInput } from "@/core/services/types";
-import type { Grade, Section } from "@/features/school/services/types";
+import type { Teacher } from "@/features/school/pages/teachers/services/types";
 
 export type TeachersQueryResponse = {
-  teachers: {
-    id: string;
-    name: string;
-    email: string;
-    contactNumber: string;
-    grades: {
-      grade: Grade;
-      sections: {
-        section: Section;
-      }[];
-    }[];
-  }[];
-  totalTeachers: number;
+  teachers: Teacher[];
 };
 
 export type TeachersQueryInput = PaginationInput & {

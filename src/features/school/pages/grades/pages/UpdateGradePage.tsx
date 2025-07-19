@@ -18,8 +18,7 @@ import {
 import { UPDATE_GRADE_MUTATION } from "../services/gradeMutations";
 import { GRADES_SECTIONS_AND_SCHOOL_QUERY } from "../services/gradeQueries";
 
-import { FormWrapper, PageWrapper } from "@/components";
-import { title } from "@/components/primitives";
+import { FormSkeleton, FormWrapper, PageWrapper } from "@/components";
 import { BreadcrumbNav, Button, Select } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
@@ -156,115 +155,124 @@ export default function UpdateGradePage() {
   }, [createdGrades, reset, schoolGradeId]);
 
   return (
-    <PageWrapper>
-      <BreadcrumbNav
-        items={[
-          { label: "Schools", to: "../../.." },
-          { label: data?.school?.name, isLoading, to: ".." },
-          { label: "Update Grade/Year & Sections" },
-        ]}
-      />
-      <h1 className={title({ size: "lg" })}>Update Grade/Year & Sections</h1>
-      <FormWrapper>
-        <Form
-          className="flex flex-col gap-5 px-5"
-          validationBehavior="aria"
-          onSubmit={handleSubmit(handleCreateSchoolGrade)}
-        >
-          <Controller
-            control={control}
-            name="gradeId"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <Select
-                {...field}
-                isRequired
-                disabledKeys={disabledGrades?.map((grade) =>
-                  grade.grade.id.toString(),
-                )}
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                isLoading={isLoading}
-                label="Grade/Year"
-                labelPlacement="outside"
-                placeholder="Select"
-                selectedKeys={[field.value]}
-                variant="bordered"
-              >
-                {data?.grades?.map((grade) => (
-                  <SelectItem key={grade.id} textValue={grade.grade}>
-                    {grade.grade}
-                  </SelectItem>
-                ))}
-              </Select>
-            )}
+    <PageWrapper
+      slots={{
+        breadcrumb: (
+          <BreadcrumbNav
+            items={[
+              { label: "Schools", to: "../../.." },
+              { label: data?.school?.name, isLoading, to: ".." },
+              { label: "Update Grade/Year & Sections" },
+            ]}
           />
-
-          <div className="flex w-full flex-col gap-3">
-            <p
-              className={twMerge(
-                "required ms-0.5 text-sm",
-                errors?.sectionIds?.message && "text-danger",
+        ),
+        title: "Update Grade/Year & Sections",
+      }}
+    >
+      <FormWrapper>
+        {isLoading ? (
+          <FormSkeleton />
+        ) : (
+          <Form
+            className="flex flex-col gap-5 px-5"
+            validationBehavior="aria"
+            onSubmit={handleSubmit(handleCreateSchoolGrade)}
+          >
+            <Controller
+              control={control}
+              name="gradeId"
+              render={({ field, fieldState: { invalid, error } }) => (
+                <Select
+                  {...field}
+                  isRequired
+                  disabledKeys={disabledGrades?.map((grade) =>
+                    grade.grade.id.toString(),
+                  )}
+                  errorMessage={error?.message}
+                  isInvalid={invalid}
+                  isLoading={isLoading}
+                  label="Grade/Year"
+                  labelPlacement="outside"
+                  placeholder="Select"
+                  selectedKeys={[field.value]}
+                  variant="bordered"
+                >
+                  {data?.grades?.map((grade) => (
+                    <SelectItem key={grade.id} textValue={grade.grade}>
+                      {grade.grade}
+                    </SelectItem>
+                  ))}
+                </Select>
               )}
-            >
-              Section
-            </p>
-            <Checkbox
-              className="mb-0.5"
-              classNames={{ label: "text-sm" }}
-              isSelected={
-                sectionIds?.length !== 0 &&
-                sectionIds?.length === data?.sections?.length
-              }
-              onChange={handleSelectAll}
-            >
-              Select All
-            </Checkbox>
+            />
 
-            <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(2.5rem,1fr))] gap-2">
-              {isLoading
-                ? Array.from({ length: 26 }).map((_, i) => (
-                    <Skeleton key={i} className="w-10 rounded-lg">
-                      <div className="bg-default-200 h-10 w-10 rounded-lg" />
-                    </Skeleton>
-                  ))
-                : data?.sections?.map((section, i) => {
-                    const selected = sectionIds.includes(section.id);
+            <div className="flex w-full flex-col gap-3">
+              <p
+                className={twMerge(
+                  "required ms-0.5 text-sm",
+                  errors?.sectionIds?.message && "text-danger",
+                )}
+              >
+                Section
+              </p>
+              <Checkbox
+                className="mb-0.5"
+                classNames={{ label: "text-sm" }}
+                isSelected={
+                  sectionIds?.length !== 0 &&
+                  sectionIds?.length === data?.sections?.length
+                }
+                onChange={handleSelectAll}
+              >
+                Select All
+              </Checkbox>
 
-                    return (
-                      <Sections
-                        key={section.id}
-                        delay={i * 0.07}
-                        handleChangeSection={handleSectionChange}
-                        section={section}
-                        selected={selected}
-                      />
-                    );
-                  })}
+              <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(2.5rem,1fr))] gap-2">
+                {isLoading
+                  ? Array.from({ length: 26 }).map((_, i) => (
+                      <Skeleton key={i} className="w-10 rounded-lg">
+                        <div className="bg-default-200 h-10 w-10 rounded-lg" />
+                      </Skeleton>
+                    ))
+                  : data?.sections?.map((section, i) => {
+                      const selected = sectionIds.includes(section.id);
+
+                      return (
+                        <Sections
+                          key={section.id}
+                          delay={i * 0.07}
+                          handleChangeSection={handleSectionChange}
+                          section={section}
+                          selected={selected}
+                        />
+                      );
+                    })}
+              </div>
+              {errors?.sectionIds && errors?.sectionIds?.message && (
+                <small className="text-tiny text-danger">
+                  {errors?.sectionIds?.message}
+                </small>
+              )}
             </div>
-            {errors?.sectionIds && errors?.sectionIds?.message && (
-              <small className="text-tiny text-danger">
-                {errors?.sectionIds?.message}
-              </small>
-            )}
-          </div>
-          <div className="mt-5 flex w-full items-center justify-end gap-2">
-            <Button
-              color="default"
-              disabled={isCreatingSchoolGrade}
-              variant="flat"
-              onPress={handleCancel}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="primary"
-              isLoading={isCreatingSchoolGrade}
-              type="submit"
-            >
-              Save
-            </Button>
-          </div>
-        </Form>
+            <div className="mt-5 flex w-full items-center justify-end gap-2">
+              <Button
+                color="default"
+                disabled={isCreatingSchoolGrade}
+                variant="flat"
+                onPress={handleCancel}
+              >
+                Cancel
+              </Button>
+              <Button
+                color="primary"
+                isLoading={isCreatingSchoolGrade}
+                type="submit"
+              >
+                Save
+              </Button>
+            </div>
+          </Form>
+        )}
       </FormWrapper>
     </PageWrapper>
   );

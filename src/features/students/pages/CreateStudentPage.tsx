@@ -4,8 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { Link } from "react-router";
 
-import B2BStudentForm from "../components/CreateStudent/B2BStudentForm";
-import B2CStudentForm from "../components/CreateStudent/B2CStudentForm";
+import { B2BStudentForm, B2CStudentForm } from "../components/CreateStudent";
 
 import { title } from "@/components/primitives";
 import { Button } from "@/components/ui";
@@ -49,8 +48,6 @@ export default function CreateStudentPage() {
               aria-label="Student Type"
               classNames={{
                 tabList: "bg-white border-1 shadow-none",
-                // tab: "p-0",
-                // tabContent: "h-full w-full",
               }}
               color="primary"
               radius="full"

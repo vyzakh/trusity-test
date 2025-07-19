@@ -23,14 +23,7 @@ export const CreateSchoolSchema = z
 
     customCurriculum: z.string().optional(),
 
-    totalLicense: z
-      .string("Total licenses must be a numeric value")
-      .refine((val) => /^\d+$/.test(val), {
-        message: "Total licenses must be a whole number",
-      })
-      .refine((val) => parseInt(val, 10) >= 1, {
-        message: "Total licenses must be at least 1",
-      }),
+    totalLicense: z.number().min(1, ""),
 
     address: z.object({
       streetAddressLine1: z

@@ -13,7 +13,6 @@ import { twMerge } from "tailwind-merge";
 import { useDebounce } from "use-debounce";
 import { z } from "zod";
 
-import TopContent from "../components/TopContent";
 import {
   StudentFilterSchema,
   type StudentFilterSchemaType,
@@ -33,6 +32,7 @@ import type {
   StudentsQueryResponse,
   TotalStudentsQueryResponse,
 } from "@/features/students/services/types";
+import { TopContent } from "../components";
 
 const columns = [
   { name: "S.No", uid: "id" },
@@ -169,7 +169,7 @@ export default function StudentsPage() {
                 <div className="flex items-center justify-center">
                   <Button
                     isIconOnly
-                    className="data-[hover=true]:bg-default/20"
+                    className="action-btn"
                     radius="full"
                     size="sm"
                     variant="light"
@@ -192,7 +192,7 @@ export default function StudentsPage() {
                   </Button>
                   <Button
                     as={Link}
-                    className="data-[hover=true]:bg-default/20 min-w-min px-3 group-hover:text-[#4F78FB]"
+                    className="action-btn min-w-min px-3 group-hover:text-[#4F78FB]"
                     size="sm"
                     variant="light"
                   >

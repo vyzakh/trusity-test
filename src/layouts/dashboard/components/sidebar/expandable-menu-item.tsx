@@ -119,7 +119,7 @@ export default function ExpandableMenuItem({
                         <Button
                           as={Link}
                           className={cn(
-                            "text-primary-text h-[var(--nav-item-sub-height)] w-full justify-start text-sm",
+                            "text-primary-text w-full justify-start text-sm",
                             isActiveSubmenu && "text-primary font-semibold",
                           )}
                           color="primary"

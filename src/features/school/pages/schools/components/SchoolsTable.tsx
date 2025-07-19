@@ -17,6 +17,7 @@ import { z } from "zod";
 
 import { SCHOOLS_QUERY, TOTAL_SCHOOLS_QUERY } from "../services/schoolQueries";
 
+import { NA } from "@/components";
 import { Button } from "@/components/ui";
 import Pagination from "@/components/ui/pagination";
 import { DEFAULT_ROW_STYLES, Table } from "@/components/ui/table";
@@ -34,9 +35,9 @@ const columns = [
   { name: "", uid: "logo" },
   { name: "School Name", uid: "school" },
   { name: "Email", uid: "email" },
-  { name: "No.of License", uid: "licenses" },
+  { name: "No.of Licences", uid: "licences" },
   { name: "No.of Teacher", uid: "teachers" },
-  { name: "Active Students", uid: "students" },
+  { name: "No.of Students", uid: "students" },
   { name: "In progress", uid: "i" },
   { name: "Completed", uid: "e" },
   { name: "Action", uid: "action" },
@@ -104,7 +105,8 @@ export default function SchoolsTable() {
             align={
               [
                 "action",
-                "licenses",
+                "email",
+                "licences",
                 "teachers",
                 "students",
                 "i",
@@ -131,18 +133,28 @@ export default function SchoolsTable() {
             <TableRow key={school?.id} className={twMerge(DEFAULT_ROW_STYLES)}>
               <TableCell>{slNo}</TableCell>
               <TableCell className="p-0">
-                <Image className="size-8" radius="none" src={school.logoUrl} />
+                <Image
+                  className="size-8 object-contain group-hover:bg-white"
+                  radius="none"
+                  src={school.logoUrl ?? "/logo.png"}
+                />
               </TableCell>
-              <TableCell>{school?.name}</TableCell>
-              <TableCell>{school?.contact?.email}</TableCell>
+              <TableCell>
+                <p className="line-clamp-2 max-w-44">{school?.name}</p>
+              </TableCell>
+              <TableCell>
+                <p className="max-w-44 truncate text-center">
+                  {school?.contact?.email ?? <NA />}
+                </p>
+              </TableCell>
               <TableCell className="text-center">
                 {school?.license?.totalLicense}
               </TableCell>
               <TableCell className="text-center">
-                {"school?.teachers"}
+                {school?.stats?.totalTeachers}
               </TableCell>
               <TableCell className="text-center">
-                {"school?.students"}
+                {school?.stats?.totalStudents}
               </TableCell>
               <TableCell>
                 <div className="flex h-full w-full items-center justify-center">
@@ -181,7 +193,7 @@ export default function SchoolsTable() {
                   <Button
                     isIconOnly
                     as={Link}
-                    className="data-[hover=true]:bg-default/20"
+                    className="action-btn"
                     radius="full"
                     size="sm"
                     state={{ from: "/schools" }}
@@ -204,7 +216,7 @@ export default function SchoolsTable() {
                   </Button>
                   <Button
                     as={Link}
-                    className="data-[hover=true]:bg-default/20 min-w-min px-3 group-hover:text-[#4F78FB]"
+                    className="action-btn min-w-min px-3 group-hover:text-[#4F78FB]"
                     size="sm"
                     to={school?.id}
                     variant="light"

@@ -21,7 +21,7 @@ const columns = [
   { name: "", uid: "logo" },
   { name: "School Name", uid: "school" },
   { name: "Email", uid: "email" },
-  { name: "No.of License", uid: "licenses" },
+  { name: "No.of Licences", uid: "licence" },
   { name: "No.of Teacher", uid: "teachers" },
   { name: "Active Students", uid: "students" },
   { name: "I", uid: "i" },
@@ -40,7 +40,7 @@ export default function SchoolTable() {
             align={
               [
                 "action",
-                "licenses",
+                "licence",
                 "teachers",
                 "students",
                 "i",

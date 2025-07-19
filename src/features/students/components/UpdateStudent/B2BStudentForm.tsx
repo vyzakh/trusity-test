@@ -1,95 +1,73 @@
-import { AutocompleteItem } from "@heroui/autocomplete";
+import { useMutation, useQuery } from "@apollo/client";
 import { Form } from "@heroui/form";
-import { SelectItem } from "@heroui/select";
+import { addToast } from "@heroui/toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseDate } from "@internationalized/date";
+import { DateTime } from "luxon";
 import React from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
+import { useNavigate, useParams } from "react-router";
 
-import {
-  CreateStudentSchema,
-  type CreateStudentSchemaType,
-} from "../../schemas/createStudentSchema";
-
-import {
-  Autocomplete,
-  Button,
-  DatePicker,
-  Input,
-  PhoneInput,
-  Select,
-} from "@/components/ui";
+import { Button, DatePicker, Input, PhoneInput } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import type { BusinessType } from "@/core/services/types";
 import { omitKeys } from "@/core/utils/object";
-import { SCHOOLS_QUERY } from "@/features/school/pages/schools/services/schoolQueries";
-import type { SchoolsQueryResponse } from "@/features/school/pages/schools/services/types";
-import { GuardianDetails } from "@/features/school/pages/students/components";
-import type { CreateB2BStudentSchemaType } from "@/features/school/pages/students/schemas/createB2BStudentSchema";
-import { CREATE_B2B_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
-import type { CreateB2BStudentResponse } from "@/features/school/pages/students/services/types";
+
+import { UPDATE_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
+import type { UpdateB2BStudentResponse } from "@/features/school/pages/students/services/types";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
-import { useMutation, useQuery } from "@apollo/client";
-import { addToast } from "@heroui/toast";
-import { parseDate } from "@internationalized/date";
-import { DateTime } from "luxon";
-import { useNavigate } from "react-router";
+import { STUDENTS_QUERY } from "@/features/students/services/studentQueries";
+import type { StudentQueryResponse } from "@/features/students/services/types";
 import {
-  STUDENTS_QUERY,
-  TOTAL_STUDENTS_QUERY,
-} from "../../services/studentQueries";
+  CreateB2BStudentSchema,
+  type UpdateB2BStudentSchemaType,
+} from "../../schemas/studentSchema";
+import GuardianDetails from "../GuardianDetails";
+import SchoolInfo from "../SchoolInfo";
 
-type CreateStudentInput = Omit<
-  CreateB2BStudentSchemaType,
-  "sectionId" | "gradeId"
+type UpdateteStudentInput = Omit<
+  UpdateB2BStudentSchemaType,
+  "sectionId" | "gradeId" | "schoolId"
 > & {
   schoolSectionId: string;
 };
 
-export default function B2BStudentForm() {
-  const navigate = useNavigate();
-  const [sections, setSections] = React.useState<
-    { id: string; section: string }[]
-  >([]);
+type B2BStudentFormProps = {
+  studentData: StudentQueryResponse["student"];
+};
 
-  //LIST ALL B2B SCHOOLS QUERY
-  const { data: b2bSchools, loading: isLoadingSchools } = useQuery<
-    SchoolsQueryResponse,
-    { accountType: BusinessType }
-  >(SCHOOLS_QUERY, {
-    variables: { accountType: "B2B" },
-  });
+export default function B2BStudentForm({ studentData }: B2BStudentFormProps) {
+  const { studentId } = useParams();
+  const navigate = useNavigate();
 
   //CREATE B2B STUDENT MUTATION
-  const [createStudent, { loading: isCreating }] = useMutation<
-    CreateB2BStudentResponse,
+  const [updateStudent, { loading: isCreating }] = useMutation<
+    UpdateB2BStudentResponse,
     {
-      schoolId: string;
+      studentId: string;
       accountType: BusinessType;
-      input: CreateStudentInput;
+      input: UpdateteStudentInput;
     }
-  >(CREATE_B2B_STUDENT_MUTATION, {
+  >(UPDATE_STUDENT_MUTATION, {
     refetchQueries: [
       {
         query: STUDENTS_QUERY,
         variables: { limit: 10, offset: 0 },
       },
-      {
-        query: TOTAL_STUDENTS_QUERY,
-      },
     ],
   });
 
   //RHF CONFIG
-  const methods = useForm<CreateStudentSchemaType>({
-    resolver: zodResolver(CreateStudentSchema),
+  const methods = useForm<UpdateB2BStudentSchemaType>({
+    resolver: zodResolver(CreateB2BStudentSchema.omit({ email: true })),
     defaultValues: {
       name: "",
-      email: "",
-      gradeId: "",
       contactNumber: "",
       dateOfBirth: "",
+      schoolId: "",
       sectionId: "",
+      gradeId: "",
       guardian: {
         name: "",
         email: "",
@@ -104,9 +82,6 @@ export default function B2BStudentForm() {
     name: "schoolId",
   });
 
-  //SELECTED GRADE ID
-  const selectedGrade = useWatch({ control: methods.control, name: "gradeId" });
-
   //LIST ALL GRADES BY SCHOOL QUERY
   const { data: schoolData, loading: isLoadingSchoolData } = useQuery<
     GradesBySchoolQueryResponse,
@@ -116,12 +91,8 @@ export default function B2BStudentForm() {
     skip: !selectedSchool,
   });
 
-  //ALL SCHOOLS AND GRADES
-  const schools = b2bSchools?.schools || [];
-  const grades = schoolData?.school?.grades || [];
-
   // STUDENT CREATE HANDLER
-  const handleCreateStudent = async (data: CreateStudentSchemaType) => {
+  const handleUpdateStudent = async (data: UpdateB2BStudentSchemaType) => {
     const rest = omitKeys(data, ["gradeId", "sectionId", "schoolId"]);
 
     try {
@@ -129,10 +100,10 @@ export default function B2BStudentForm() {
         ?.find((g) => g.id === data.gradeId)
         ?.sections?.find((s) => s.id === data.sectionId)?.id;
 
-      const response = await createStudent({
+      const response = await updateStudent({
         variables: {
+          studentId: studentId!,
           accountType: "B2B",
-          schoolId: data.schoolId,
           input: {
             ...rest,
             schoolSectionId: schoolGradeSectionId!,
@@ -141,12 +112,13 @@ export default function B2BStudentForm() {
       });
 
       addToast({
-        title: response?.data?.createStudent?.message,
+        title: response?.data?.updateStudent?.message,
         color: "success",
       });
       handleCancel();
     } catch (error) {
       const errMsg = handleApolloError(error);
+
       addToast({ title: errMsg, color: "danger" });
     }
   };
@@ -157,227 +129,130 @@ export default function B2BStudentForm() {
     navigate("..");
   };
 
-  //SET SECTIONS BASED ON SELECTED GRADE
+  const handleReset = React.useCallback(() => {
+    if (studentData) {
+      const {
+        name,
+        dateOfBirth,
+        contactNumber,
+        grade,
+        guardian,
+        section,
+        school,
+      } = studentData;
+      methods.reset({
+        name,
+        contactNumber,
+        dateOfBirth: DateTime.fromISO(dateOfBirth, { zone: "utc" })
+          .toLocal()
+          .toFormat("yyyy-MM-dd"),
+        gradeId: !("text" in grade) ? grade.id : "",
+        sectionId: !("text" in section) ? section.id : "",
+        schoolId: school.id,
+        guardian: {
+          name: guardian.name,
+          email: guardian.email,
+          contactNumber: guardian.contactNumber,
+        },
+      });
+    }
+  }, [methods, studentData]);
+
   React.useEffect(() => {
-    if (!selectedGrade) return;
-
-    const selected = schoolData?.school?.grades?.find(
-      (g) => g.id === selectedGrade,
-    );
-
-    setSections(
-      selected?.sections.map((s) => ({
-        id: s.id,
-        section: s.section.section,
-      })) || [],
-    );
-  }, [selectedGrade, schoolData]);
+    handleReset();
+  }, [handleReset]);
 
   return (
-    <React.Fragment>
-      <FormProvider {...methods}>
-        <Form
-          className="flex flex-col gap-5"
-          validationBehavior="aria"
-          onSubmit={methods.handleSubmit(handleCreateStudent)}
-        >
-          <Controller
-            control={methods.control}
-            name="name"
-            render={({ field, fieldState: { error, invalid } }) => (
-              <Input
-                {...field}
-                isRequired
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                label="Name"
-                labelPlacement="outside"
-                placeholder="Student name"
-                variant="bordered"
-              />
-            )}
-          />
-          <Controller
-            control={methods.control}
-            name="email"
-            render={({ field, fieldState: { error, invalid } }) => (
-              <Input
-                {...field}
-                isRequired
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                label="Email"
-                labelPlacement="outside"
-                placeholder="Email"
-                type="email"
-                variant="bordered"
-              />
-            )}
-          />
+    <FormProvider {...methods}>
+      <Form
+        className="flex flex-col gap-5 px-5"
+        validationBehavior="aria"
+        onSubmit={methods.handleSubmit(handleUpdateStudent)}
+      >
+        <Controller
+          control={methods.control}
+          name="name"
+          render={({ field, fieldState: { error, invalid } }) => (
+            <Input
+              {...field}
+              isRequired
+              errorMessage={error?.message}
+              isInvalid={invalid}
+              label="Name"
+              placeholder="Student name"
+              variant="bordered"
+            />
+          )}
+        />
 
-          <Controller
-            control={methods.control}
-            name="contactNumber"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <PhoneInput
-                {...field}
-                isRequired
-                defaultCountry="AE"
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                label="Contact Number"
-              />
-            )}
-          />
-          <Controller
-            control={methods.control}
-            name="dateOfBirth"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <DatePicker
-                {...field}
-                isRequired
-                showMonthAndYearPickers
-                classNames={{ inputWrapper: "shadow-none border-1" }}
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                label="Date of Birth"
-                labelPlacement="outside"
-                value={field?.value !== "" ? parseDate(field.value) : null}
-                variant="bordered"
-                onChange={(val) => {
-                  if (val) {
-                    const formatted = DateTime.fromObject({
-                      year: val.year,
-                      month: val.month,
-                      day: val.day,
-                    }).toFormat("yyyy-MM-dd");
+        <Controller
+          control={methods.control}
+          name="contactNumber"
+          render={({ field, fieldState: { invalid, error } }) => (
+            <PhoneInput
+              {...field}
+              isRequired
+              defaultCountry="AE"
+              errorMessage={error?.message}
+              isInvalid={invalid}
+              label="Contact Number"
+            />
+          )}
+        />
+        <Controller
+          control={methods.control}
+          name="dateOfBirth"
+          render={({ field, fieldState: { invalid, error } }) => (
+            <DatePicker
+              {...field}
+              isRequired
+              showMonthAndYearPickers
+              classNames={{ inputWrapper: "shadow-none border-1" }}
+              errorMessage={error?.message}
+              isInvalid={invalid}
+              label="Date of Birth"
+              labelPlacement="outside"
+              value={field?.value !== "" ? parseDate(field.value) : null}
+              variant="bordered"
+              onChange={(val) => {
+                if (val) {
+                  const formatted = DateTime.fromObject({
+                    year: val.year,
+                    month: val.month,
+                    day: val.day,
+                  }).toFormat("yyyy-MM-dd");
 
-                    field.onChange(formatted);
-                  } else {
-                    field.onChange(null);
-                  }
-                }}
-              />
-            )}
-          />
+                  field.onChange(formatted);
+                } else {
+                  field.onChange(null);
+                }
+              }}
+            />
+          )}
+        />
 
-          {/* GUARDIANS DETAILS */}
-          <GuardianDetails />
+        {/* GUARDIANS DETAILS */}
+        <GuardianDetails />
+        <SchoolInfo
+          schoolData={schoolData?.school}
+          isLoading={isLoadingSchoolData}
+        />
 
-          <Controller
-            control={methods.control}
-            name="schoolId"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <Autocomplete
-                isRequired
-                errorMessage={error?.message}
-                inputProps={{
-                  classNames: {
-                    inputWrapper: "border-small shadow-none",
-                  },
-                }}
-                isDisabled={isLoadingSchools}
-                isInvalid={invalid}
-                items={schools}
-                label="School"
-                labelPlacement="outside-top"
-                name={field.name}
-                selectedKey={field.value}
-                variant="bordered"
-                onBlur={field.onBlur}
-                onSelectionChange={(e) => field.onChange(e)}
-              >
-                {(school) => (
-                  <AutocompleteItem key={school.id} textValue={school.name}>
-                    {school.name}
-                  </AutocompleteItem>
-                )}
-              </Autocomplete>
-            )}
-          />
-
-          <Controller
-            control={methods.control}
-            name="gradeId"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <Select
-                {...field}
-                isRequired
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                isLoading={isLoadingSchoolData}
-                isDisabled={!selectedSchool}
-                label="Grade/Year"
-                labelPlacement="outside"
-                placeholder="Select"
-                variant="bordered"
-              >
-                {grades?.map((grade) => (
-                  <SelectItem key={grade.id} textValue={grade.grade.grade}>
-                    {grade.grade.grade}
-                  </SelectItem>
-                ))}
-              </Select>
-            )}
-          />
-
-          <Controller
-            control={methods.control}
-            name="sectionId"
-            render={({ field, fieldState: { invalid, error } }) => (
-              <Autocomplete
-                isRequired
-                errorMessage={error?.message}
-                inputProps={{
-                  classNames: {
-                    inputWrapper: "border-small shadow-none",
-                  },
-                }}
-                isDisabled={!selectedGrade}
-                isInvalid={invalid}
-                items={sections}
-                label="Section"
-                labelPlacement="outside"
-                name={field.name}
-                placeholder="Select"
-                selectedKey={field.value}
-                variant="bordered"
-                onBlur={field.onBlur}
-                onSelectionChange={(e) => field.onChange(e)}
-              >
-                {(section) => (
-                  <AutocompleteItem
-                    key={section.id}
-                    textValue={section.section}
-                  >
-                    {section.section}
-                  </AutocompleteItem>
-                )}
-              </Autocomplete>
-            )}
-          />
-          <div className="flex w-full items-center justify-end gap-2">
-            <Button
-              className="h-9"
-              color="default"
-              disabled={isCreating}
-              type="reset"
-              variant="flat"
-              onPress={handleCancel}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="h-9"
-              color="primary"
-              isLoading={isCreating}
-              type="submit"
-            >
-              Save
-            </Button>
-          </div>
-        </Form>
-      </FormProvider>
-    </React.Fragment>
+        <div className="flex w-full items-center justify-end gap-2">
+          <Button
+            color="default"
+            disabled={isCreating}
+            type="reset"
+            variant="flat"
+            onPress={handleCancel}
+          >
+            Cancel
+          </Button>
+          <Button color="primary" isLoading={isCreating} type="submit">
+            Save
+          </Button>
+        </div>
+      </Form>
+    </FormProvider>
   );
 }

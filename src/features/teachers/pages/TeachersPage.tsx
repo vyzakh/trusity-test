@@ -13,9 +13,12 @@ import { twMerge } from "tailwind-merge";
 import { useDebounce } from "use-debounce";
 import { z } from "zod";
 
-import { TEACHERS_QUERY } from "../services/teachersQuery";
+import {
+  TEACHERS_QUERY,
+  TOTAL_TEACHERS_QUERY,
+} from "../services/teachersQuery";
 
-import { SearchIcon } from "@/components";
+import { PageWrapper, SearchIcon } from "@/components";
 import { title } from "@/components/primitives";
 import { Button, Input } from "@/components/ui";
 import Pagination from "@/components/ui/pagination";
@@ -25,6 +28,7 @@ import { getSerialNumber } from "@/core/utils/pagination";
 import type {
   TeachersQueryInput,
   TeachersQueryResponse,
+  TotalTeachersQueryResponse,
 } from "../services/types";
 
 const columns = [
@@ -48,12 +52,22 @@ export default function TeachersPage() {
         offset,
         ...(debouncedName && { name: debouncedName }),
       },
-      returnPartialData: true,
     },
   );
 
+  const { data: total } = useQuery<
+    TotalTeachersQueryResponse,
+    TeachersQueryInput
+  >(TOTAL_TEACHERS_QUERY, {
+    variables: {
+      limit,
+      offset,
+      ...(debouncedName && { name: debouncedName }),
+    },
+  });
+
   const teachers = data?.teachers || [];
-  const totalTeachers = data?.totalTeachers || 0;
+  const totalTeachers = total?.totalTeachers || 0;
 
   //TABLE LOADING STATE
   const loadingState = loading ? "loading" : "idle";
@@ -68,13 +82,16 @@ export default function TeachersPage() {
   const handleClear = () => setName(null);
 
   return (
-    <section className="flex flex-col gap-5">
-      <div className="mb-10 flex items-center justify-between">
-        <h1 className={title({ size: "lg" })}>Teachers</h1>
-        <Button as={Link} color="secondary" to="#">
-          Add Teacher
-        </Button>
-      </div>
+    <PageWrapper
+      slots={{
+        title: "Teachers",
+        actions: [
+          <Button as={Link} color="secondary" to="#">
+            Add Teacher
+          </Button>,
+        ],
+      }}
+    >
       <Table
         aria-label="Teachers table"
         bottomContent={<Pagination totalCount={totalTeachers} />}
@@ -156,7 +173,7 @@ export default function TeachersPage() {
           })}
         </TableBody>
       </Table>
-    </section>
+    </PageWrapper>
   );
 }
 

@@ -1,5 +1,5 @@
-import { MutationResponse } from "@/core/services/types";
-import {
+import type { MutationResponse } from "@/core/services/types";
+import type {
   Grade,
   GradesBySchool,
   Section,

@@ -28,8 +28,8 @@ export default function Header() {
         borderImageSlice: 1,
       }}
     >
-      <div className="relative grid h-[var(--header-height)] grid-cols-[var(--sidebar-width)_1fr_var(--sidebar-width)] gap-5 bg-white/[0.001] py-2 backdrop-blur before:absolute before:inset-0 before:-z-[1] before:rounded-md before:bg-white/20 before:backdrop-blur-md before:content-['']">
-        <section className="grid shrink-0 place-items-center px-2">
+      <div className="relative grid h-[var(--header-height)] grid-cols-[var(--sidebar-width)_1fr] gap-5 bg-white/[0.001] backdrop-blur before:absolute before:inset-0 before:-z-[1] before:rounded-md before:bg-white/20 before:backdrop-blur-md before:content-[''] lg:grid-cols-[var(--sidebar-width)_1fr_var(--sidebar-width)]">
+        <section className="grid place-items-center px-2">
           <Logo />
         </section>
         <section className="hidden place-items-center lg:grid">

@@ -121,6 +121,7 @@ export default function StudentsPage() {
                       variant="light"
                       as={Link}
                       to={`${student.id}/update`}
+                      className="action-btn"
                     >
                       <svg
                         fill="none"
@@ -138,7 +139,7 @@ export default function StudentsPage() {
                     </Button>
                     <Button
                       as={Link}
-                      className="min-w-min px-2 group-hover:bg-transparent group-hover:text-[#4F78FB]"
+                      className="data-[hover=true]:bg-default/20 min-w-min px-3 group-hover:text-[#4F78FB]"
                       size="sm"
                       // to={school?.id}
                       variant="light"

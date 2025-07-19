@@ -1,13 +1,13 @@
+import { useMutation, useQuery } from "@apollo/client";
 import { AutocompleteItem } from "@heroui/autocomplete";
 import { Form } from "@heroui/form";
+import { addToast } from "@heroui/toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseDate } from "@internationalized/date";
+import { DateTime } from "luxon";
 import React from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-
-import {
-  CreateB2CStudentSchema,
-  type CreateB2CStudentSchemaType,
-} from "../../schemas/createStudentSchema";
+import { useNavigate, useParams } from "react-router";
 
 import {
   Autocomplete,
@@ -30,24 +30,28 @@ import type {
   CreateSchoolResponse,
   SchoolsQueryResponse,
 } from "@/features/school/pages/schools/services/types";
-import { GuardianDetails } from "@/features/school/pages/students/components";
-import { CREATE_B2B_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
-import type { CreateB2BStudentResponse } from "@/features/school/pages/students/services/types";
-import { useMutation, useQuery } from "@apollo/client";
+import { UPDATE_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
+import type { UpdateB2BStudentResponse } from "@/features/school/pages/students/services/types";
+import { STUDENTS_QUERY } from "@/features/students/services/studentQueries";
+import type { StudentQueryResponse } from "@/features/students/services/types";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/modal";
-import { addToast } from "@heroui/toast";
-import { parseDate } from "@internationalized/date";
-import { DateTime } from "luxon";
-import { useNavigate } from "react-router";
 import {
-  STUDENTS_QUERY,
-  TOTAL_STUDENTS_QUERY,
-} from "../../services/studentQueries";
+  CreateB2CStudentSchema,
+  type CreateB2CStudentSchemaType,
+} from "../../schemas/studentSchema";
 import CreateB2CSchoolForm from "../CreateB2CSchoolForm";
+import GuardianDetails from "../GuardianDetails";
 
-type CreateStudentInput = Omit<CreateB2CStudentSchemaType, "schoolId">;
+type UpdateB2CStudentSchemaType = Omit<CreateB2CStudentSchemaType, "email">;
 
-export default function B2BStudentForm() {
+type B2CStudentFormProps = {
+  studentData: StudentQueryResponse["student"];
+};
+
+type UpdateB2CStudentInput = Omit<UpdateB2CStudentSchemaType, "schoolId">;
+
+export default function B2CStudentForm({ studentData }: B2CStudentFormProps) {
+  const { studentId, schoolId } = useParams();
   const navigate = useNavigate();
   const [openModal, setOpenModal] = React.useState(false);
 
@@ -59,25 +63,8 @@ export default function B2BStudentForm() {
     variables: { accountType: "B2C" },
   });
 
-  //CREATE B2B STUDENT MUTATION
-  const [createStudent, { loading: isCreating }] = useMutation<
-    CreateB2BStudentResponse,
-    {
-      schoolId: string;
-      accountType: BusinessType;
-      input: CreateStudentInput;
-    }
-  >(CREATE_B2B_STUDENT_MUTATION, {
-    refetchQueries: [
-      {
-        query: STUDENTS_QUERY,
-        variables: { limit: 10, offset: 0 },
-      },
-      {
-        query: TOTAL_STUDENTS_QUERY,
-      },
-    ],
-  });
+  //ALL SCHOOLS
+  const schools = b2cSchools?.schools || [];
 
   //CREATE SCHOOL MUTATION
   const [createSchool, { loading: isCreatingSchool }] = useMutation<
@@ -90,15 +77,28 @@ export default function B2BStudentForm() {
     ],
   });
 
+  //CREATE B2B STUDENT MUTATION
+  const [updateStudent, { loading: isCreating }] = useMutation<
+    UpdateB2BStudentResponse,
+    {
+      studentId: string;
+      accountType: BusinessType;
+      input: UpdateB2CStudentInput;
+    }
+  >(UPDATE_STUDENT_MUTATION, {
+    refetchQueries: [
+      {
+        query: STUDENTS_QUERY,
+        variables: { limit: 10, offset: 0, schoolId },
+      },
+    ],
+  });
+
   //RHF CONFIG
-  const methods = useForm<CreateB2CStudentSchemaType>({
-    resolver: zodResolver(CreateB2CStudentSchema),
+  const methods = useForm<UpdateB2CStudentSchemaType>({
+    resolver: zodResolver(CreateB2CStudentSchema.omit({ email: true })),
     defaultValues: {
       name: "",
-      email: "",
-      grade: "",
-      section: "",
-      schoolId: "",
       contactNumber: "",
       dateOfBirth: "",
       guardian: {
@@ -109,18 +109,14 @@ export default function B2BStudentForm() {
     },
   });
 
-  //ALL SCHOOLS AND GRADES
-  const schools = b2cSchools?.schools || [];
-
   // STUDENT CREATE HANDLER
-  const handleCreateStudent = async (data: CreateB2CStudentSchemaType) => {
+  const handleUpdateStudent = async (data: UpdateB2CStudentSchemaType) => {
     const rest = omitKeys(data, ["schoolId"]);
-
     try {
-      const response = await createStudent({
+      const response = await updateStudent({
         variables: {
+          studentId: studentId!,
           accountType: "B2C",
-          schoolId: data.schoolId,
           input: {
             ...rest,
           },
@@ -128,16 +124,18 @@ export default function B2BStudentForm() {
       });
 
       addToast({
-        title: response?.data?.createStudent?.message,
+        title: response?.data?.updateStudent?.message,
         color: "success",
       });
-      handleCancel();
+      navigate("..");
     } catch (error) {
       const errMsg = handleApolloError(error);
+
       addToast({ title: errMsg, color: "danger" });
     }
   };
 
+  //CREATE SCHOOL HANDLER
   const handleCreateSchool = async (data: CreateB2CSchoolSchemaType) => {
     try {
       const response = await createSchool({
@@ -157,11 +155,38 @@ export default function B2BStudentForm() {
     }
   };
 
-  //FORM CANCEL HANDLER
-  const handleCancel = () => {
-    methods.reset();
-    navigate("..");
-  };
+  const handleReset = React.useCallback(() => {
+    if (studentData) {
+      const {
+        name,
+        dateOfBirth,
+        contactNumber,
+        guardian,
+        school,
+        grade,
+        section,
+      } = studentData;
+      methods.reset({
+        name,
+        contactNumber,
+        dateOfBirth: DateTime.fromISO(dateOfBirth, { zone: "utc" })
+          .toLocal()
+          .toFormat("yyyy-MM-dd"),
+        schoolId: school.id,
+        grade: "text" in grade ? grade.text : "",
+        section: "text" in section ? section.text : "",
+        guardian: {
+          name: guardian.name,
+          email: guardian.email,
+          contactNumber: guardian.contactNumber,
+        },
+      });
+    }
+  }, [methods, studentData]);
+
+  React.useEffect(() => {
+    handleReset();
+  }, [handleReset]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -173,7 +198,7 @@ export default function B2BStudentForm() {
         <Form
           className="flex flex-col gap-4"
           validationBehavior="aria"
-          onSubmit={methods.handleSubmit(handleCreateStudent)}
+          onSubmit={methods.handleSubmit(handleUpdateStudent)}
         >
           <Controller
             control={methods.control}
@@ -191,23 +216,7 @@ export default function B2BStudentForm() {
               />
             )}
           />
-          <Controller
-            control={methods.control}
-            name="email"
-            render={({ field, fieldState: { error, invalid } }) => (
-              <Input
-                {...field}
-                isRequired
-                errorMessage={error?.message}
-                isInvalid={invalid}
-                label="Email"
-                labelPlacement="outside-top"
-                placeholder="Email"
-                type="email"
-                variant="bordered"
-              />
-            )}
-          />
+
           <Controller
             control={methods.control}
             name="contactNumber"
@@ -297,8 +306,8 @@ export default function B2BStudentForm() {
               variant="light"
               disableRipple
               size="sm"
-              className="absolute top-0 right-0 z-10 h-auto min-h-auto p-0 hover:underline data-[hover=true]:bg-transparent"
-              color="warning"
+              className="absolute top-0 right-0 z-10 h-auto min-h-auto p-0 underline data-[hover=true]:bg-transparent"
+              color="primary"
               onPress={() => setOpenModal(true)}
             >
               Create a new school
@@ -340,11 +349,10 @@ export default function B2BStudentForm() {
               className="h-9"
               color="default"
               disabled={isCreating}
-              type="reset"
               variant="flat"
-              onPress={handleCancel}
+              onPress={handleReset}
             >
-              Cancel
+              Reset
             </Button>
             <Button
               className="h-9"
@@ -362,20 +370,19 @@ export default function B2BStudentForm() {
         isOpen={openModal}
         scrollBehavior="inside"
         onClose={handleCloseModal}
+        hideCloseButton={isCreatingSchool}
+        isDismissable={!isCreatingSchool}
+        isKeyboardDismissDisabled={isCreatingSchool}
       >
         <ModalContent>
-          {() => (
-            <>
-              <ModalHeader className="text-2xl">Create School</ModalHeader>
-              <ModalBody className="pb-5">
-                <CreateB2CSchoolForm
-                  handleCancel={handleCloseModal}
-                  handleCreateSchool={handleCreateSchool}
-                  isCreatingSchool={isCreatingSchool}
-                />
-              </ModalBody>
-            </>
-          )}
+          <ModalHeader className="text-2xl">Create School</ModalHeader>
+          <ModalBody className="pb-5">
+            <CreateB2CSchoolForm
+              handleCancel={handleCloseModal}
+              handleCreateSchool={handleCreateSchool}
+              isCreatingSchool={isCreatingSchool}
+            />
+          </ModalBody>
         </ModalContent>
       </Modal>
     </React.Fragment>

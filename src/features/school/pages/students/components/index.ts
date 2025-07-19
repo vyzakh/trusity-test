@@ -1,2 +1,2 @@
-// export { default as GradeAndSections } from "./GradeAndSections";
-export { default as GuardianDetails } from "./GuardianDetails";
+export { default as GradeInfo } from "./GradeInfo";
+export { default as TopContent } from "./TopContent";

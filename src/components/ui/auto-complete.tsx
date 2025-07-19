@@ -8,6 +8,7 @@ import { twMerge } from "tailwind-merge";
 const Autocomplete: React.FC<AutocompleteProps> = ({
   labelPlacement = "outside",
   variant = "bordered",
+  isClearable = false,
   ...props
 }) => {
   return (
@@ -27,6 +28,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
       }}
       labelPlacement={labelPlacement}
       variant={variant}
+      isClearable={isClearable}
     />
   );
 };

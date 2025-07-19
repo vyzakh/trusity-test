@@ -108,6 +108,9 @@ export const STUDENT_QUERY = gql`
           }
         }
       }
+      school {
+        id
+      }
     }
   }
 `;

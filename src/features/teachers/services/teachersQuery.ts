@@ -20,7 +20,6 @@ export const TEACHERS_QUERY = gql`
         }
       }
     }
-    totalTeachers(name: $name)
   }
 `;
 

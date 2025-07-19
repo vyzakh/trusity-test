@@ -1,7 +1,7 @@
 export const DEFAULT_VALUES = {
   name: "",
   logo: "",
-  totalLicense: "",
+  totalLicense: 1,
   curriculums: [],
   customCurriculum: "",
   address: {

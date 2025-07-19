@@ -16,7 +16,7 @@ export const CREATE_B2B_STUDENT_MUTATION = gql`
   }
 `;
 
-export const UPDATE_B2B_STUDENT_MUTATION = gql`
+export const UPDATE_STUDENT_MUTATION = gql`
   mutation UpdateStudent(
     $studentId: String!
     $accountType: BusinessModel!

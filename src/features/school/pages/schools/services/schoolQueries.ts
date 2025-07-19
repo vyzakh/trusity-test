@@ -60,6 +60,19 @@ export const SCHOOLS_QUERY = gql`
       license {
         totalLicense
       }
+      stats {
+        totalTeachers
+        totalStudents
+      }
+    }
+  }
+`;
+
+export const SCHOOL_NAMES_QUERY = gql`
+  query Schools($accountType: BusinessModel) {
+    schools(accountType: $accountType) {
+      id
+      name
     }
   }
 `;

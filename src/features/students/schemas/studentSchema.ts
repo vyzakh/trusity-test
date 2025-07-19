@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-import { CreateB2BStudentSchema } from "@/features/school/pages/students/schemas/createB2BStudentSchema";
+import { CreateB2BStudentSchema as CreateStudentSchema } from "@/features/school/pages/students/schemas/createB2BStudentSchema";
 
-export const CreateStudentSchema = CreateB2BStudentSchema.extend({
+export const CreateB2BStudentSchema = CreateStudentSchema.extend({
   schoolId: z.string().min(1, "Please select a school."),
 });
 
-export type CreateStudentSchemaType = z.infer<typeof CreateStudentSchema>;
+export type CreateB2BStudentSchemaType = z.infer<typeof CreateB2BStudentSchema>;
 
 export const CreateB2CStudentSchema = CreateB2BStudentSchema.omit({
   gradeId: true,
@@ -18,3 +18,8 @@ export const CreateB2CStudentSchema = CreateB2BStudentSchema.omit({
 });
 
 export type CreateB2CStudentSchemaType = z.infer<typeof CreateB2CStudentSchema>;
+
+export type UpdateB2BStudentSchemaType = Omit<
+  CreateB2BStudentSchemaType,
+  "email"
+>;

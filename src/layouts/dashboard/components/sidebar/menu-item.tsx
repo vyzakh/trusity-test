@@ -14,7 +14,7 @@ export default function MenuItem(menuItem: Omit<TMenuItem, "key">) {
   ) : (
     <Button
       as={Link}
-      className="w-full justify-start transition-colors duration-1000"
+      className="w-full justify-start transition-colors duration-500"
       color={isActive ? "primary" : "default"}
       startContent={menuItem.icon}
       to={menuItem.href}

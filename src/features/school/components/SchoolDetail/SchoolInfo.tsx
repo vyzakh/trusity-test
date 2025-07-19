@@ -9,7 +9,7 @@ import { twMerge } from "tailwind-merge";
 
 import IECCard from "../../pages/schools/components/IECCard";
 
-import { DasboardCard } from "@/components";
+import { DasboardCard, NA } from "@/components";
 import { title } from "@/components/primitives";
 import { Button } from "@/components/ui";
 import type { SchoolQueryResponse } from "../../pages/schools/services/types";
@@ -65,7 +65,7 @@ export default function SchoolInfo({ data, isLoading }: SchoolInfoParams) {
           <>
             <Image
               className="size-32 shrink-0 bg-white object-contain"
-              src={data?.logoUrl}
+              src={data?.logoUrl ?? "/logo.png"}
             />
             <div className="flex grow flex-col gap-4">
               <h1
@@ -77,16 +77,20 @@ export default function SchoolInfo({ data, isLoading }: SchoolInfoParams) {
               </h1>
               <div className="flex items-center gap-x-6">
                 <div className="flex max-w-sm flex-col gap-1">
-                  <p className="text-xs">Curriculum</p>
+                  <p className="text-xs">Curriculums</p>
                   <p className="text-medium font-bold">
-                    {data?.curriculums
-                      ?.map((c) => (c.allowCustom ? c.otherName : c.name))
-                      ?.join(", ")}
+                    {data && data?.curriculums?.length > 0 ? (
+                      data?.curriculums
+                        ?.map((c) => (c.allowCustom ? c.otherName : c.name))
+                        ?.join(", ")
+                    ) : (
+                      <NA />
+                    )}
                   </p>
                 </div>
                 <Divider className="h-8 shrink-0" orientation="vertical" />
                 <div className="flex max-w-sm flex-col gap-1">
-                  <p className="text-xs">Number of license</p>
+                  <p className="text-xs">Number of licences</p>
                   <p className="text-medium font-bold text-[#3EC7F4]">
                     {data?.license?.totalLicense}
                   </p>
@@ -127,7 +131,7 @@ export default function SchoolInfo({ data, isLoading }: SchoolInfoParams) {
               wrapper: "w-[100px] bg-danger",
               base: "w-[100px]",
               thumb:
-                "group-data-[selected]:ml-[72px] group-data-[selected]:group-data-[pressed]:ml-[68px]",
+                "group-data-[selected=true]:ms-[72px] group-data-[selected=true]:group-data-[pressed=true]:ms-[68px]",
               endContent: "text-white",
               startContent: "text-white",
             }}
@@ -198,16 +202,20 @@ export default function SchoolInfo({ data, isLoading }: SchoolInfoParams) {
             <div className="grid origin-top gap-x-3 gap-y-5 pb-5 md:grid-cols-2 lg:grid-cols-3">
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-[#1C1C1C]">Email</p>
-                <p className="text-primary font-bold">{data?.contact?.email}</p>
+                <p className="text-primary font-bold">
+                  {data?.contact?.email ?? <NA />}
+                </p>
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-[#1C1C1C]">Point of Contact</p>
-                <p className="text-primary font-bold">{data?.contact?.name}</p>
+                <p className="text-primary font-bold">
+                  {data?.contact?.name ?? <NA />}
+                </p>
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-[#1C1C1C]">Contact Number</p>
                 <p className="text-primary font-bold">
-                  {data?.contact?.contactNumber}
+                  {data?.contact?.contactNumber ?? <NA />}
                 </p>
               </div>
               <div className="flex flex-col gap-1">
@@ -242,7 +250,7 @@ export default function SchoolInfo({ data, isLoading }: SchoolInfoParams) {
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-[#1C1C1C]">Contact Number</p>
                 <p className="text-primary font-bold">
-                  {data?.address?.contactNumber}
+                  {data?.address?.contactNumber ?? <NA />}
                 </p>
               </div>
               <div className="flex flex-col gap-1">

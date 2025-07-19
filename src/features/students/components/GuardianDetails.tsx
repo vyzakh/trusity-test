@@ -2,7 +2,7 @@ import { Card } from "@heroui/card";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { Input, PhoneInput } from "@/components/ui";
-import type { CreateB2BStudentSchemaType } from "../schemas/createB2BStudentSchema";
+import type { CreateB2BStudentSchemaType } from "../../school/pages/students/schemas/createB2BStudentSchema";
 
 export default function GuardianDetails() {
   const { control } = useFormContext<CreateB2BStudentSchemaType>();
@@ -21,7 +21,7 @@ export default function GuardianDetails() {
             isInvalid={invalid}
             label="Name"
             labelPlacement="outside"
-            placeholder="Student name"
+            placeholder="Guardian name"
             variant="bordered"
           />
         )}

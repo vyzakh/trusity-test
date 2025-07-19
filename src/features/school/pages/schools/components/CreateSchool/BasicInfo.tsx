@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { SelectItem } from "@heroui/select";
+import { DevTool } from "@hookform/devtools";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
@@ -8,7 +9,7 @@ import { CURRICULUMS_QUERY } from "../../services/schoolQueries";
 
 import Upload from "./Upload";
 
-import { Input, Select } from "@/components/ui";
+import { Input, NumberInput, Select } from "@/components/ui";
 import type { SharedSelection } from "@heroui/system";
 import type { CreateSchoolSchemaType } from "../../schemas/createSchoolSchema";
 import type { CurriculumListResponse } from "../../services/types";
@@ -138,34 +139,27 @@ export default function BasicInfo() {
           control={control}
           name="totalLicense"
           render={({ field, fieldState: { error, invalid } }) => (
-            <Input
+            <NumberInput
               {...field}
+              value={field.value}
               isRequired
               errorMessage={error?.message}
-              inputMode="numeric"
               isInvalid={invalid}
-              label="Number of license"
-              labelPlacement="outside"
-              pattern="\d*"
-              placeholder=" "
+              label="Number of licences"
               variant="bordered"
-              onKeyDown={(e) => {
-                const allowed = [
-                  "Backspace",
-                  "ArrowLeft",
-                  "ArrowRight",
-                  "Tab",
-                  "Delete",
-                ];
-
-                if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) {
-                  e.preventDefault();
-                }
+              placeholder=" "
+              formatOptions={{
+                useGrouping: false,
               }}
+              onChange={() => {}}
+              onValueChange={(val) => field.onChange(val)}
+              isWheelDisabled
+              hideStepper
             />
           )}
         />
       </div>
+      <DevTool control={control} />
     </React.Fragment>
   );
 }

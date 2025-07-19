@@ -1,5 +1,5 @@
-import { MutationResponse } from "@/core/services/types";
-import { SchoolGradeWithSections } from "@/features/school/services/types";
+import type { MutationResponse } from "@/core/services/types";
+import type { SchoolGradeWithSections } from "@/features/school/services/types";
 
 export type Teacher = {
   id: string;

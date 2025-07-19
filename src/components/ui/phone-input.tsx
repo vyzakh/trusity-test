@@ -47,7 +47,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
           isInvalid && "text-danger",
           size === "sm" ? "text-xs" : size === "lg" ? "!text-base" : "text-sm",
         )}
-        htmlFor="phoneNumber"
+        htmlFor={props.name}
       >
         {label}
       </label>
@@ -146,7 +146,11 @@ const InputComponent: React.FC<InputComponentProps> = ({
       inputWrapper: clsx(
         "rounded-r-lg rounded-l-none h-8 border-none shadow-none",
         classNames?.inputWrapper,
-        size === "lg" ? "h-9" : size == "sm" ? "h-7" : "h-8",
+        size === "lg"
+          ? "h-9 min-h-9"
+          : size == "sm"
+            ? "h-7 min-h-7"
+            : "h-8 min-h-8",
       ),
       mainWrapper: "block",
     }}
@@ -154,7 +158,7 @@ const InputComponent: React.FC<InputComponentProps> = ({
     description={description}
     endContent={endContent}
     errorMessage={errorMessage}
-    id={id}
+    id={id ?? name}
     isDisabled={disabled || isDisabled}
     isReadOnly={readOnly || isReadOnly}
     label={null}
