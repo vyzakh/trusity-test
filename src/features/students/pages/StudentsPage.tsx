@@ -141,7 +141,7 @@ export default function StudentsPage() {
                       as={Link}
                       className="data-[hover=true]:bg-default/20 min-w-min px-3 group-hover:text-[#4F78FB]"
                       size="sm"
-                      // to={school?.id}
+                      to={student?.id}
                       variant="light"
                     >
                       View

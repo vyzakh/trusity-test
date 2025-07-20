@@ -28,7 +28,7 @@ export default function DasboardCard({
     const controls = animate(count, totalCount, { duration: 1 });
 
     return () => controls.stop();
-  }, []);
+  }, [count, totalCount]);
 
   return (
     <Card classNames={{ base: "shadow-none" }}>
