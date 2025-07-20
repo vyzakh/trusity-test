@@ -86,7 +86,7 @@ export default function TeachersPage() {
       slots={{
         title: "Teachers",
         actions: [
-          <Button as={Link} color="secondary" to="#">
+          <Button as={Link} color="secondary" to="create">
             Add Teacher
           </Button>,
         ],

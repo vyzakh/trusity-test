@@ -9,11 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { useQueryState } from "nuqs";
 import { Link } from "react-router";
 import { twMerge } from "tailwind-merge";
-import { useDebounce } from "use-debounce";
-import { z } from "zod";
 
 import { SCHOOLS_QUERY, TOTAL_SCHOOLS_QUERY } from "../services/schoolQueries";
 
@@ -22,6 +19,7 @@ import { Button } from "@/components/ui";
 import Pagination from "@/components/ui/pagination";
 import { DEFAULT_ROW_STYLES, Table } from "@/components/ui/table";
 import { usePagination } from "@/core/hooks/usePagination";
+import { useSearchName } from "@/core/hooks/useSearchName";
 import { getSerialNumber } from "@/core/utils/pagination";
 import type {
   SchoolsInput,
@@ -44,9 +42,8 @@ const columns = [
 ];
 
 export default function SchoolsTable() {
-  const { limit, offset, page, updateSearchParams } = usePagination();
-  const [name, setName] = useQueryState("name", z.string().nullable());
-  const [debouncedName] = useDebounce(name, 300);
+  const { limit, offset, page } = usePagination();
+  const { debouncedName, handleClear, handleSearch, name } = useSearchName();
 
   //SCHOOL LIST QUERY
   const { data, loading } = useQuery<SchoolsQueryResponse, SchoolsInput>(
@@ -72,15 +69,6 @@ export default function SchoolsTable() {
 
   const schools = data?.schools || [];
   const totalSchools = total?.totalSchools || 0;
-
-  //SEARCH HANDLER
-  const handleSearch = (value: string) => {
-    setName(value !== "" ? value : null);
-    updateSearchParams({ page: 1 });
-  };
-
-  //CLEAR SEARCH HANDLER
-  const handleClear = () => setName(null);
 
   //TABLE LOADING STATE
   const loadingState = loading ? "loading" : "idle";

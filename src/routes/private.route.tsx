@@ -13,7 +13,9 @@ import {
   CreateTeacherPage,
   DashboardPage,
   GlobalCreateStudentPage,
+  GlobalCreateTeachersPage,
   GlobalStudentsPage,
+  GlobalTeachersPage,
   GlobalUpdateStudentPage,
   GradesPage,
   SchoolsPage,
@@ -25,7 +27,6 @@ import {
   UpdateStudentPage,
   UpdateTeacherPage,
 } from "@/features";
-import { GlobalTeachersPage } from "@/features/teachers/pages";
 import { DashboardLayout, SchoolLayout } from "@/layouts";
 
 const privateRoutes: RouteObject[] = [
@@ -160,7 +161,7 @@ const privateRoutes: RouteObject[] = [
             path: "teachers",
             children: [
               { index: true, element: <GlobalTeachersPage /> },
-              // { path: "create", element: <GlobalCreateStudentPage /> },
+              { path: "create", element: <GlobalCreateTeachersPage /> },
             ],
           },
         ],

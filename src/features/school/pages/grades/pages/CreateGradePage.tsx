@@ -15,15 +15,16 @@ import {
   type CreateGradeSchemaType,
 } from "../schemas/createGradeSchema";
 import { CREATE_GRADE_MUTATION } from "../services/gradeMutations";
-import { GRADES_SECTIONS_AND_SCHOOL_QUERY } from "../services/gradeQueries";
 
 import { FormWrapper, PageWrapper } from "@/components";
 import { title } from "@/components/primitives";
 import { BreadcrumbNav, Button, Select } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
+import { GRADES_AND_SECTIONS_QUERY } from "../services/gradeQueries";
 import type {
   CreateSchoolGradeResponse,
+  GradesSectionsAndSchoolQueryInput,
   GradesSectionsAndSchoolQueryResponse,
 } from "../services/types";
 
@@ -48,20 +49,13 @@ export default function CreateGradePage() {
   });
 
   // GET GRADES, SECTIONS AND SCHOOL QUERY
-  const {
-    data = {
-      grades: [],
-      sections: [],
-      school: { grades: [], name: "", id: "" },
-    },
-    loading: isLoading,
-  } = useQuery<GradesSectionsAndSchoolQueryResponse, { schoolId: string }>(
-    GRADES_SECTIONS_AND_SCHOOL_QUERY,
-    {
-      variables: { schoolId: schoolId! },
-      skip: !schoolId,
-    },
-  );
+  const { data, loading: isLoading } = useQuery<
+    GradesSectionsAndSchoolQueryResponse,
+    GradesSectionsAndSchoolQueryInput
+  >(GRADES_AND_SECTIONS_QUERY, {
+    variables: { schoolId: schoolId!, includeSchool: true },
+    skip: !schoolId,
+  });
 
   //RHF CONFIQURATION
   const {
@@ -78,6 +72,10 @@ export default function CreateGradePage() {
     },
     mode: "onChange",
   });
+
+  //GRADES
+  const grades = data?.grades ?? [];
+  const sections = data?.sections ?? [];
 
   //SELECTING ALREADY CREATED GRADE
   const createdGrades = data?.school?.grades ?? [];
@@ -166,7 +164,7 @@ export default function CreateGradePage() {
                 placeholder="Select"
                 variant="bordered"
               >
-                {data?.grades?.map((grade) => (
+                {grades?.map((grade) => (
                   <SelectItem key={grade.id} textValue={grade.grade}>
                     {grade.grade}
                   </SelectItem>
@@ -203,7 +201,7 @@ export default function CreateGradePage() {
                       <div className="bg-default-200 h-10 w-10 rounded-lg" />
                     </Skeleton>
                   ))
-                : data?.sections?.map((section, i) => {
+                : sections?.map((section, i) => {
                     const selected = sectionIds.includes(section.id);
 
                     return (

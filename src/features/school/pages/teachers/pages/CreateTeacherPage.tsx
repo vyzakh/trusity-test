@@ -23,7 +23,6 @@ import {
 import { CREATE_TEACHER_MUTATION } from "../services/teacherMutations";
 
 import { FormWrapper, PageWrapper } from "@/components";
-import { title } from "@/components/primitives";
 import {
   BreadcrumbNav,
   Button,
@@ -39,23 +38,16 @@ import {
   TEACHERS_QUERY,
   TOTAL_TEACHERS_QUERY,
 } from "@/features/teachers/services/teachersQuery";
-import type { CreateTeacherResponse } from "../services/types";
+import type {
+  CreateTeacherPayload,
+  CreateTeacherResponse,
+} from "../services/types";
 
 const gradesTableColumns = [
   { name: "Grade", uid: "grade" },
   { name: "Sections", uid: "sections" },
   { name: "Action", uid: "action" },
 ];
-
-type CreateTeacherPayload = {
-  schoolId: string;
-  input: {
-    name: string;
-    email: string;
-    contactNumber: string;
-    schoolSectionIds: string[];
-  };
-};
 
 export default function CreateTeacherPage() {
   const navigate = useNavigate();
@@ -148,19 +140,24 @@ export default function CreateTeacherPage() {
   };
 
   return (
-    <PageWrapper>
-      <BreadcrumbNav
-        items={[
-          { label: "Schools", to: "../../.." },
-          {
-            label: schoolData?.school?.name,
-            isLoading: isLoading,
-            to: "..",
-          },
-          { label: "Add Teacher" },
-        ]}
-      />
-      <h1 className={title({ size: "lg" })}>Add Teacher</h1>
+    <PageWrapper
+      slots={{
+        title: "Add Teacher",
+        breadcrumb: (
+          <BreadcrumbNav
+            items={[
+              { label: "Schools", to: "../../.." },
+              {
+                label: schoolData?.school?.name,
+                isLoading: isLoading,
+                to: "..",
+              },
+              { label: "Add Teacher" },
+            ]}
+          />
+        ),
+      }}
+    >
       <FormWrapper>
         <Form className="flex flex-col gap-5" validationBehavior="aria">
           <Controller

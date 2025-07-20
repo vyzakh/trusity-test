@@ -75,7 +75,7 @@ export default function SchoolInfo({ data, isLoading }: SchoolInfoParams) {
               >
                 {data?.name}
               </h1>
-              <div className="flex items-center gap-x-6">
+              <div className="flex flex-col items-start gap-x-2 gap-y-3 md:flex-row">
                 <div className="flex max-w-sm flex-col gap-1">
                   <p className="text-xs">Curriculums</p>
                   <p className="text-medium font-bold">
@@ -88,9 +88,14 @@ export default function SchoolInfo({ data, isLoading }: SchoolInfoParams) {
                     )}
                   </p>
                 </div>
-                <Divider className="h-8 shrink-0" orientation="vertical" />
+                <Divider
+                  className="hidden h-8 shrink-0"
+                  orientation="vertical"
+                />
                 <div className="flex max-w-sm flex-col gap-1">
-                  <p className="text-xs">Number of licences</p>
+                  <p className="text-xs whitespace-nowrap">
+                    Number of licences
+                  </p>
                   <p className="text-medium font-bold text-[#3EC7F4]">
                     {data?.license?.totalLicense}
                   </p>

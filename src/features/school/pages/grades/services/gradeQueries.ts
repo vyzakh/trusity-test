@@ -1,7 +1,10 @@
 import { gql } from "@apollo/client";
 
-export const GRADES_SECTIONS_AND_SCHOOL_QUERY = gql`
-  query GradesSectionsAndSchool($schoolId: String!) {
+export const GRADES_AND_SECTIONS_QUERY = gql`
+  query GradesSectionsAndSchool(
+    $schoolId: String!
+    $includeSchool: Boolean = false
+  ) {
     grades {
       id
       grade
@@ -10,7 +13,7 @@ export const GRADES_SECTIONS_AND_SCHOOL_QUERY = gql`
       id
       section
     }
-    school(schoolId: $schoolId) {
+    school(schoolId: $schoolId) @include(if: $includeSchool) {
       id
       name
       grades {

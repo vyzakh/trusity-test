@@ -5,10 +5,19 @@ import type {
   Section,
 } from "@/features/school/services/types";
 
-export type GradesSectionsAndSchoolQueryResponse = {
+export type GradesAndSectionsQueryResponse = {
   grades: Grade[];
   sections: Section[];
-  school: GradesBySchool;
+};
+
+export type GradesSectionsAndSchoolQueryResponse =
+  GradesAndSectionsQueryResponse & {
+    school: GradesBySchool;
+  };
+
+export type GradesSectionsAndSchoolQueryInput = {
+  schoolId: string;
+  includeSchool: boolean;
 };
 
 export type CreateSchoolGradeResponse = MutationResponse<"createSchoolGrade">;

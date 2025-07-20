@@ -4,17 +4,16 @@ import { Form } from "@heroui/form";
 import { SelectItem } from "@heroui/select";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { useParams } from "react-router";
+import { Controller, useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 
 import { SearchIcon } from "@/components";
 import { title } from "@/components/primitives";
 import { Autocomplete, Button, Input, Select } from "@/components/ui";
 import { emptyStringToNull } from "@/core/utils/string";
-import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
-import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
-import type { StudentFilterSchemaType } from "../schemas/studentFilterSchema";
+import { GRADES_AND_SECTIONS_QUERY } from "@/features/school/pages/grades/services/gradeQueries";
+import type { GradesAndSectionsQueryResponse } from "@/features/school/pages/grades/services/types";
+import type { StudentFilterSchemaType } from "@/features/school/pages/students/schemas/studentFilterSchema";
 
 type TopContentProps = {
   handleSearch: (val: string) => void;
@@ -31,19 +30,14 @@ const TopContent = ({
   handleFilter,
   filters,
 }: TopContentProps) => {
-  const { schoolId } = useParams<{ schoolId: string }>();
   const [openFilter, setOpenFilter] = React.useState(false);
-  const [sections, setSections] = React.useState<
-    { id: string; section: string }[]
-  >([]);
 
-  //LIST ALL GRADES BY SCHOOL QUERY
-  const { data: schoolData, loading: isLoadingSchoolData } = useQuery<
-    GradesBySchoolQueryResponse,
-    { schoolId: string }
-  >(GRADES_BY_SCHOOL_QUERY, {
-    variables: { schoolId: schoolId! },
-    skip: !schoolId,
+  // GET GRADES AND SECTIONS QUERY
+  const { data, loading: isLoading } = useQuery<
+    GradesAndSectionsQueryResponse,
+    { includeSchool: boolean; schoolId: string }
+  >(GRADES_AND_SECTIONS_QUERY, {
+    variables: { includeSchool: false, schoolId: "" },
   });
 
   const { control, handleSubmit, reset, setValue } =
@@ -54,8 +48,8 @@ const TopContent = ({
       },
     });
 
-  const selectedGrade = useWatch({ control, name: "schoolGradeId" });
-  const grades = schoolData?.school?.grades || [];
+  const grades = data?.grades || [];
+  const sections = data?.sections || [];
 
   const handleSubmitFilter = (data: StudentFilterSchemaType) =>
     handleFilter({
@@ -64,22 +58,6 @@ const TopContent = ({
     });
 
   const handleOpenFilter = () => setOpenFilter(true);
-
-  //SET SECTIONS BASED ON GRADE
-  React.useEffect(() => {
-    if (isLoadingSchoolData || !selectedGrade) return;
-
-    const selected = schoolData?.school?.grades?.find(
-      (g) => g.id === selectedGrade,
-    );
-
-    setSections(
-      selected?.sections.map((s) => ({
-        id: s.id,
-        section: s.section.section,
-      })) || [],
-    );
-  }, [selectedGrade, isLoadingSchoolData, schoolData]);
 
   //ACTIVATE FILTER IF ALREADY APPLIED
   React.useEffect(() => {
@@ -161,7 +139,7 @@ const TopContent = ({
                     render={({ field: { value, ...rest } }) => (
                       <Select
                         {...rest}
-                        isLoading={isLoadingSchoolData}
+                        isLoading={isLoading}
                         label="Grade/Year"
                         labelPlacement="outside"
                         placeholder="Select"
@@ -173,11 +151,8 @@ const TopContent = ({
                         }
                       >
                         {grades?.map((grade) => (
-                          <SelectItem
-                            key={grade.id}
-                            textValue={grade.grade.grade}
-                          >
-                            {grade.grade.grade}
+                          <SelectItem key={grade.id} textValue={grade.grade}>
+                            {grade.grade}
                           </SelectItem>
                         ))}
                       </Select>
@@ -194,7 +169,6 @@ const TopContent = ({
                           },
                         }}
                         isClearable={false}
-                        isDisabled={!selectedGrade}
                         items={sections}
                         label="Section"
                         labelPlacement="outside"
