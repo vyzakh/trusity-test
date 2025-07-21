@@ -183,6 +183,7 @@ export default function StudentsPage() {
                     className="action-btn min-w-min px-3 group-hover:text-[#4F78FB]"
                     size="sm"
                     variant="light"
+                    to={student.id}
                   >
                     View
                   </Button>

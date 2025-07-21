@@ -113,7 +113,6 @@ export default function CreateSchoolPage() {
               <Button
                 color="default"
                 disabled={isCreating}
-                type="reset"
                 variant="flat"
                 onPress={handleCancel}
               >

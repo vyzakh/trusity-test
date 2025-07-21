@@ -6,17 +6,20 @@ import RouteGuard from "./components/RouteGuard";
 
 import {
   AdminsPage,
-  ChallengesPage,
   CreateGradePage,
   CreateSchoolPage,
   CreateStudentPage,
   CreateTeacherPage,
   DashboardPage,
+  GlobalAddChallenge,
+  GlobalChallengesPage,
   GlobalCreateStudentPage,
   GlobalCreateTeachersPage,
+  GlobalStudentDetailsPage,
   GlobalStudentsPage,
   GlobalTeachersPage,
   GlobalUpdateStudentPage,
+  GlobalUpdateTeacherPage,
   GradesPage,
   SchoolsPage,
   StudentDetailsPage,
@@ -46,12 +49,10 @@ const privateRoutes: RouteObject[] = [
           },
           {
             path: "challenges",
-            element: (
-              <div className="">
-                <div className="h-screen">Haaaaaai</div>
-                <div className="h-screen">Haaaaaai1222</div>
-              </div>
-            ),
+            children: [
+              { index: true, element: <GlobalChallengesPage /> },
+              { path: "create", element: <GlobalAddChallenge /> },
+            ],
           },
           {
             path: "schools",
@@ -83,10 +84,10 @@ const privateRoutes: RouteObject[] = [
                         path: "teachers",
                         element: <TeachersPage />,
                       },
-                      {
-                        path: "challenges",
-                        element: <ChallengesPage />,
-                      },
+                      // {
+                      //   path: "challenges",
+                      //   element: <ChallengesPage />,
+                      // },
                       {
                         path: "admins",
                         element: <AdminsPage />,
@@ -115,6 +116,13 @@ const privateRoutes: RouteObject[] = [
                     path: "students",
                     children: [
                       { path: "create", element: <CreateStudentPage /> },
+                      {
+                        path: ":studentId",
+                        children: [
+                          { index: true, element: <StudentDetailsPage /> },
+                          { path: "update", element: <UpdateStudentPage /> },
+                        ],
+                      },
                       {
                         path: ":studentId/update",
                         element: <UpdateStudentPage />,
@@ -150,7 +158,7 @@ const privateRoutes: RouteObject[] = [
               {
                 path: ":studentId",
                 children: [
-                  { index: true, element: <StudentDetailsPage /> },
+                  { index: true, element: <GlobalStudentDetailsPage /> },
                   { path: "update", element: <GlobalUpdateStudentPage /> },
                 ],
               },
@@ -162,6 +170,13 @@ const privateRoutes: RouteObject[] = [
             children: [
               { index: true, element: <GlobalTeachersPage /> },
               { path: "create", element: <GlobalCreateTeachersPage /> },
+              {
+                path: ":teacherId",
+                children: [
+                  { index: true, element: <GlobalStudentDetailsPage /> },
+                  { path: "update", element: <GlobalUpdateTeacherPage /> },
+                ],
+              },
             ],
           },
         ],

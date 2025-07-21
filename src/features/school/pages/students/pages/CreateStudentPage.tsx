@@ -15,10 +15,12 @@ import { omitKeys } from "@/core/utils/object";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
 import { GuardianDetails } from "@/features/students/components";
+import { CREATE_B2B_STUDENT_MUTATION } from "@/features/students/services/studentMutation";
 import {
   STUDENTS_QUERY,
   TOTAL_STUDENTS_QUERY,
 } from "@/features/students/services/studentQueries";
+import type { CreateB2BStudentResponse } from "@/features/students/services/types";
 import { useMutation } from "@apollo/client";
 import { Form } from "@heroui/form";
 import { addToast } from "@heroui/toast";
@@ -32,8 +34,6 @@ import {
   CreateB2BStudentSchema,
   type CreateB2BStudentSchemaType,
 } from "../schemas/createB2BStudentSchema";
-import { CREATE_B2B_STUDENT_MUTATION } from "../services/studentMutations";
-import type { CreateB2BStudentResponse } from "../services/types";
 
 type CreateStudentInput = Omit<
   CreateB2BStudentSchemaType,

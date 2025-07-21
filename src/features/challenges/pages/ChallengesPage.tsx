@@ -1,3 +1,5 @@
+import { PageWrapper } from "@/components";
+import { Button, Pagination } from "@/components/ui";
 import { useQuery } from "@apollo/client";
 import { Spinner } from "@heroui/spinner";
 import {
@@ -7,105 +9,85 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { Link } from "react-router";
 import { twMerge } from "tailwind-merge";
 
-import {
-  STUDENTS_QUERY,
-  TOTAL_STUDENTS_QUERY,
-} from "../services/studentQueries";
-
-import { PageWrapper } from "@/components";
-import { Button, Pagination } from "@/components/ui";
 import { DEFAULT_ROW_STYLES, Table } from "@/components/ui/table";
 import { usePagination } from "@/core/hooks/usePagination";
 import { useSearchName } from "@/core/hooks/useSearchName";
 import { getSerialNumber } from "@/core/utils/pagination";
-import {
-  StudentFilterSchema,
-  type StudentFilterSchemaType,
-} from "@/features/school/pages/students/schemas/studentFilterSchema";
-import { useQueryStates } from "nuqs";
-import { TopContent } from "../components";
+import { DateTime } from "luxon";
+import { Link } from "react-router";
+import TopContent from "../components/TopContent";
+import { CHALLENGES_QUERY } from "../services/challengeQueries";
 import type {
-  StudentQueryInput,
-  StudentsQueryResponse,
-  TotalStudentsQueryResponse,
+  ChallengesQueryInput,
+  ChallengesQueryResponse,
 } from "../services/types";
 
 const columns = [
   { name: "S.No", uid: "id" },
-  { name: "Student Name", uid: "name" },
-  { name: "Contact Number", uid: "contactNumber" },
-  { name: "Grade/Year", uid: "year" },
-  { name: "Section", uid: "section" },
-  { name: "Challenges", uid: "challenges" },
-  { name: "In Progress", uid: "inprogress" },
+  { name: "Challenge Title", uid: "title" },
+  { name: "Created By", uid: "createdBy" },
+  { name: "Created Date", uid: "createdDate" },
+  { name: "SDG", uid: "sdg" },
+  { name: "Sector", uid: "sector" },
+  { name: "Company Name", uid: "companyName" },
+  { name: "In Progress", uid: "inProgress" },
   { name: "Completed", uid: "completed" },
+  { name: "Assign To", uid: "assignTo" },
   { name: "Action", uid: "action" },
 ];
 
-export default function StudentsPage() {
-  const { limit, page, offset } = usePagination();
-  const { debouncedName, name, handleClear, handleSearch } = useSearchName();
-  const [filters, setFilters] = useQueryStates(StudentFilterSchema.shape);
+export default function ChallengesPage() {
+  const { limit, offset, page } = usePagination();
+  const { debouncedName, handleClear, handleSearch, name } = useSearchName();
 
-  const { data, loading } = useQuery<StudentsQueryResponse, StudentQueryInput>(
-    STUDENTS_QUERY,
-    {
-      variables: {
-        limit,
-        offset,
-        ...(debouncedName && { name: debouncedName }),
-        ...Object.fromEntries(
-          Object.entries(filters).filter(([, value]) => value != null),
-        ),
-      },
-    },
-  );
-
-  const { data: total } = useQuery<
-    TotalStudentsQueryResponse,
-    StudentQueryInput
-  >(TOTAL_STUDENTS_QUERY, {
+  //CHALLENGE LIST QUERY
+  const { data, loading } = useQuery<
+    ChallengesQueryResponse,
+    ChallengesQueryInput
+  >(CHALLENGES_QUERY, {
     variables: {
+      limit,
+      offset,
       ...(debouncedName && { name: debouncedName }),
-      ...Object.fromEntries(
-        Object.entries(filters).filter(([, value]) => value != null),
-      ),
     },
   });
 
-  const students = data?.students || [];
-  const totalStudents = total?.totalStudents || 0;
+  //TOTAL SCHOOLS QUERY
+  // const { data: total } = useQuery<TotalSchoolsQueryResponse, SchoolsInput>(
+  //   TOTAL_SCHOOLS_QUERY,
+  //   {
+  //     variables: {
+  //       ...(debouncedName && { name: debouncedName }),
+  //     },
+  //   },
+  // );
+
+  const challenges = data?.challenges || [];
+  const totalSchools = 0;
 
   //TABLE LOADING STATE
   const loadingState = loading ? "loading" : "idle";
 
-  const handleFilter = (data: StudentFilterSchemaType) => {
-    setFilters(data);
-  };
-
   return (
     <PageWrapper
       slots={{
-        title: "Students",
+        title: "Challenges",
         actions: [
-          <Button as={Link} color="secondary" to="create">
-            Add Student
+          <Button color="secondary" as={Link} to="create">
+            Add Challenge
           </Button>,
         ],
       }}
     >
       <Table
         aria-label="Schools table"
-        bottomContent={<Pagination totalCount={totalStudents} />}
+        bottomContent={<Pagination totalCount={totalSchools} />}
         bottomContentPlacement="outside"
         topContent={
           <TopContent
-            filters={filters}
             handleClear={handleClear}
-            handleFilter={handleFilter}
             handleSearch={handleSearch}
             value={name}
           />
@@ -115,63 +97,61 @@ export default function StudentsPage() {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={
-                [
-                  "action",
-                  "year",
-                  "section",
-                  "challenges",
-                  "inprogress",
-                  "completed",
-                ].includes(column.uid)
-                  ? "center"
-                  : "start"
-              }
+              align={["action"].includes(column.uid) ? "center" : "start"}
             >
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
         <TableBody
-          emptyContent={"No students found"}
+          emptyContent={"No challenges found"}
           loadingContent={<Spinner />}
           loadingState={loadingState}
         >
-          {students?.map((student, i) => {
+          {challenges?.map((challenge, i) => {
             const slNo = getSerialNumber(i, page, limit);
 
             return (
               <TableRow
-                key={student?.id}
+                key={challenge?.id}
                 className={twMerge(DEFAULT_ROW_STYLES)}
               >
                 <TableCell>{slNo}</TableCell>
-                <TableCell>{student?.name}</TableCell>
-                <TableCell>{student?.contactNumber}</TableCell>
-                <TableCell className="text-center">
-                  {"text" in student.grade
-                    ? student.grade.text
-                    : student.grade.grade.grade}
-                </TableCell>
-                <TableCell className="text-center">
-                  {"text" in student.section
-                    ? student.section.text
-                    : student.section.section.section}
-                </TableCell>
-                <TableCell className="text-center">Challenge Count</TableCell>
-                <TableCell className="text-center">In-Progress count</TableCell>
-                <TableCell className="text-center">Completed count</TableCell>
 
+                <TableCell>
+                  <p className="line-clamp-2 max-w-44">{challenge?.title}</p>
+                </TableCell>
+                <TableCell>
+                  <p className="max-w-44 truncate">
+                    {challenge?.createdBy?.name}
+                  </p>
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {DateTime.fromISO(challenge?.createdAt, { zone: "utc" })
+                    .toLocal()
+                    .toFormat("dd MMM yyyy")}
+                </TableCell>
+                <TableCell>
+                  <p className="line-clamp-2 max-w-44">
+                    {challenge?.sdgs?.map((sdg) => sdg.title).join(", ")}
+                  </p>
+                </TableCell>
+                <TableCell>{challenge?.sector.name}</TableCell>
+                <TableCell>{challenge?.companyName}</TableCell>
+                <TableCell>{challenge?.companyName}</TableCell>
+                <TableCell>{challenge?.companyName}</TableCell>
+                <TableCell>{challenge?.companyName}</TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center">
                     <Button
                       isIconOnly
+                      // as={Link}
+                      className="action-btn"
                       radius="full"
                       size="sm"
+                      // state={{ from: "/schools" }}
+                      // to={`${school.id}/update`}
                       variant="light"
-                      as={Link}
-                      to={`${student.id}/update`}
-                      className="action-btn"
                     >
                       <svg
                         fill="none"
@@ -188,10 +168,10 @@ export default function StudentsPage() {
                       </svg>
                     </Button>
                     <Button
-                      as={Link}
-                      className="data-[hover=true]:bg-default/20 min-w-min px-3 group-hover:text-[#4F78FB]"
+                      // as={Link}
+                      className="action-btn min-w-min px-3 group-hover:text-[#4F78FB]"
                       size="sm"
-                      to={student?.id}
+                      // to={school?.id}
                       variant="light"
                     >
                       View

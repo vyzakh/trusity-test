@@ -33,6 +33,8 @@ export const Select = extendVariants(HerouiSelect, {
   },
   defaultVariants: {
     size: "md",
+    labelPlacement: "outside",
+    placeholder: "Select",
   },
 });
 

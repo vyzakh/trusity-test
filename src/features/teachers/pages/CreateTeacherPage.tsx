@@ -161,7 +161,11 @@ export default function CreateTeacherPage() {
     <PageWrapper
       slots={{
         title: "Add Teacher",
-        breadcrumb: <BreadcrumbNav items={[{ label: "Teachers", to: ".." }]} />,
+        breadcrumb: (
+          <BreadcrumbNav
+            items={[{ label: "Teachers", to: ".." }, { label: "Add Teacher" }]}
+          />
+        ),
       }}
     >
       <FormWrapper>

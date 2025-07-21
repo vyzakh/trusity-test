@@ -1,3 +1,3 @@
-import React from "react";
+// import React from "react";
 
-export const ChallengesPage = React.lazy(() => import("./ChallengesPage"));
+// export const ChallengesPage = React.lazy(() => import("./ChallengesPage"));

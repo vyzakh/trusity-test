@@ -7,6 +7,6 @@ export const GlobalCreateStudentPage = React.lazy(
 export const GlobalUpdateStudentPage = React.lazy(
   () => import("./UpdateStudentPage"),
 );
-export const StudentDetailsPage = React.lazy(
+export const GlobalStudentDetailsPage = React.lazy(
   () => import("./StudentDetailsPage"),
 );

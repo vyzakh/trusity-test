@@ -21,6 +21,10 @@ export const TEACHER_QUERY = gql`
           }
         }
       }
+      school {
+        id
+        name
+      }
     }
   }
 `;

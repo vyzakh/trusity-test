@@ -57,7 +57,6 @@ export default function SchoolInfo({ schoolData, isLoading }: SchoolInfoProps) {
 
   return (
     <React.Fragment>
-      {" "}
       <Controller
         control={control}
         name="schoolId"

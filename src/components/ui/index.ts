@@ -9,4 +9,5 @@ export { default as Pagination } from "./pagination";
 export * from "./phone-input";
 export { default as Select } from "./select";
 export * from "./table";
+export { default as Textarea } from "./text-area";
 export { default as Upload } from "./upload";

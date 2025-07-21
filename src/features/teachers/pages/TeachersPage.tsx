@@ -142,7 +142,15 @@ export default function TeachersPage() {
 
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center">
-                    <Button isIconOnly radius="full" size="sm" variant="light">
+                    <Button
+                      isIconOnly
+                      radius="full"
+                      size="sm"
+                      variant="light"
+                      className="action-btn"
+                      as={Link}
+                      to={`${teacher?.id}/update`}
+                    >
                       <svg
                         fill="none"
                         height="16"
@@ -159,7 +167,7 @@ export default function TeachersPage() {
                     </Button>
                     <Button
                       as={Link}
-                      className="min-w-min px-2 group-hover:bg-transparent group-hover:text-[#4F78FB]"
+                      className="action-btn min-w-min px-3 group-hover:text-[#4F78FB]"
                       size="sm"
                       // to={school?.id}
                       variant="light"
@@ -192,7 +200,7 @@ export const TopContent = ({
         Teachers
       </h1>
       <Input
-        className="ml-auto max-w-sm min-w-44"
+        className="ms-auto max-w-xs min-w-44"
         classNames={{
           inputWrapper:
             "group-data-[hover=true]:bg-white group-data-[focus=true]:bg-white shadow-none bg-[#BFBFBF33] ",

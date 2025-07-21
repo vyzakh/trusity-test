@@ -12,7 +12,6 @@ import {
   CreateB2BStudentSchema,
   type CreateB2BStudentSchemaType,
 } from "../schemas/createB2BStudentSchema";
-import { UPDATE_STUDENT_MUTATION } from "../services/studentMutations";
 
 import { FormSkeleton, FormWrapper, PageWrapper } from "@/components";
 import {
@@ -28,13 +27,16 @@ import { omitKeys } from "@/core/utils/object";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
 import { GuardianDetails } from "@/features/students/components";
+import { UPDATE_STUDENT_MUTATION } from "@/features/students/services/studentMutation";
 import {
   STUDENT_QUERY,
   STUDENTS_QUERY,
 } from "@/features/students/services/studentQueries";
-import type { StudentQueryResponse } from "@/features/students/services/types";
+import type {
+  StudentQueryResponse,
+  UpdateB2BStudentResponse,
+} from "@/features/students/services/types";
 import { GradeInfo } from "../components";
-import type { UpdateB2BStudentResponse } from "../services/types";
 
 type UpdateB2BStudentSchemaType = Omit<CreateB2BStudentSchemaType, "email">;
 

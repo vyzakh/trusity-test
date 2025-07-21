@@ -39,6 +39,7 @@ import type { GradesBySchoolQueryResponse } from "@/features/school/services/typ
 import { TEACHERS_QUERY } from "@/features/teachers/services/teachersQuery";
 import type {
   TeacherQueryResponse,
+  UpdateTeacherPayload,
   UpdateTeacherResponse,
 } from "../services/types";
 
@@ -47,16 +48,6 @@ const gradesTableColumns = [
   { name: "Sections", uid: "sections" },
   { name: "Action", uid: "action" },
 ];
-
-type UpdateTeacherPayload = {
-  teacherId: string;
-  input: {
-    name: string;
-    email: string;
-    contactNumber: string;
-    schoolSectionIds: string[];
-  };
-};
 
 export default function UpdateTeacherPage() {
   const navigate = useNavigate();

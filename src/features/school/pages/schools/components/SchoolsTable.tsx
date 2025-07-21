@@ -15,8 +15,7 @@ import { twMerge } from "tailwind-merge";
 import { SCHOOLS_QUERY, TOTAL_SCHOOLS_QUERY } from "../services/schoolQueries";
 
 import { NA } from "@/components";
-import { Button } from "@/components/ui";
-import Pagination from "@/components/ui/pagination";
+import { Button, Pagination } from "@/components/ui";
 import { DEFAULT_ROW_STYLES, Table } from "@/components/ui/table";
 import { usePagination } from "@/core/hooks/usePagination";
 import { useSearchName } from "@/core/hooks/useSearchName";

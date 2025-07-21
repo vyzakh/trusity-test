@@ -4,3 +4,6 @@ export const GlobalTeachersPage = React.lazy(() => import("./TeachersPage"));
 export const GlobalCreateTeachersPage = React.lazy(
   () => import("./CreateTeacherPage"),
 );
+export const GlobalUpdateTeacherPage = React.lazy(
+  () => import("./UpdateTeacherPage"),
+);

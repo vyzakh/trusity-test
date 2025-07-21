@@ -30,18 +30,19 @@ import type {
   CreateSchoolResponse,
   SchoolsQueryResponse,
 } from "@/features/school/pages/schools/services/types";
-import { CREATE_B2B_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
-import type { CreateB2BStudentResponse } from "@/features/school/pages/students/services/types";
+
 import { useMutation, useQuery } from "@apollo/client";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/modal";
 import { addToast } from "@heroui/toast";
 import { parseDate } from "@internationalized/date";
 import { DateTime } from "luxon";
 import { useNavigate } from "react-router";
+import { CREATE_B2B_STUDENT_MUTATION } from "../../services/studentMutation";
 import {
   STUDENTS_QUERY,
   TOTAL_STUDENTS_QUERY,
 } from "../../services/studentQueries";
+import type { CreateB2BStudentResponse } from "../../services/types";
 import CreateB2CSchoolForm from "../CreateB2CSchoolForm";
 import GuardianDetails from "../GuardianDetails";
 

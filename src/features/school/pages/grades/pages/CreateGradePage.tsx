@@ -73,7 +73,7 @@ export default function CreateGradePage() {
     mode: "onChange",
   });
 
-  //GRADES
+  //GRADES AND SECTIONS
   const grades = data?.grades ?? [];
   const sections = data?.sections ?? [];
 

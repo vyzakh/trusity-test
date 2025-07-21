@@ -12,8 +12,6 @@ import { Button, DatePicker, Input, PhoneInput } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import type { BusinessType } from "@/core/services/types";
 import { omitKeys } from "@/core/utils/object";
-import { CREATE_B2B_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
-import type { CreateB2BStudentResponse } from "@/features/school/pages/students/services/types";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
 import { useMutation, useQuery } from "@apollo/client";
@@ -21,10 +19,12 @@ import { addToast } from "@heroui/toast";
 import { parseDate } from "@internationalized/date";
 import { DateTime } from "luxon";
 import { useNavigate } from "react-router";
+import { CREATE_B2B_STUDENT_MUTATION } from "../../services/studentMutation";
 import {
   STUDENTS_QUERY,
   TOTAL_STUDENTS_QUERY,
 } from "../../services/studentQueries";
+import type { CreateB2BStudentResponse } from "../../services/types";
 import GuardianDetails from "../GuardianDetails";
 import SchoolInfo from "../SchoolInfo";
 

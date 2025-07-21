@@ -7,6 +7,7 @@ export type Teacher = {
   email: string;
   contactNumber: string;
   grades: SchoolGradeWithSections[];
+  school: { id: string; name: string };
 };
 
 export type TeacherQueryResponse = {
@@ -15,6 +16,16 @@ export type TeacherQueryResponse = {
 
 export type CreateTeacherPayload = {
   schoolId: string;
+  input: {
+    name: string;
+    email: string;
+    contactNumber: string;
+    schoolSectionIds: string[];
+  };
+};
+
+export type UpdateTeacherPayload = {
+  teacherId: string;
   input: {
     name: string;
     email: string;

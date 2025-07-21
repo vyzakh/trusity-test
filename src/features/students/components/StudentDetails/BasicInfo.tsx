@@ -119,45 +119,99 @@ export default function BasicInfo({ data, isLoading }: BasicInfoParams) {
           </Card>
         </div>
       </div>
-      <div className="grid origin-top gap-x-3 gap-y-5 pb-5 md:grid-cols-2 lg:grid-cols-3">
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-[#1C1C1C]">Email</p>
-          <p className="text-primary font-bold">{data?.email ?? <NA />}</p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-[#1C1C1C]">Contact Number</p>
-          <p className="text-primary font-bold">
-            {data?.contactNumber ?? <NA />}
-          </p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-[#1C1C1C]">Date of Birth</p>
-          <p className="text-primary font-bold">
-            {data?.dateOfBirth ? (
-              DateTime.fromISO(data.dateOfBirth, { zone: "utc" })
-                .toLocal()
-                .toFormat("dd/MM/yyyy")
-            ) : (
-              <NA />
-            )}
-          </p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-[#1C1C1C]">Guardian Name</p>
-          <p className="text-primary font-bold">{data?.guardian?.name}</p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-[#1C1C1C]">Guardian Email</p>
-          <p className="text-primary font-bold">{data?.guardian?.email}</p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-[#1C1C1C]">Guardian Contact Number</p>
-          <p className="text-primary font-bold">
-            {data?.guardian?.contactNumber}
-          </p>
-        </div>
+      <div className="grid origin-top gap-x-3 gap-y-5 md:grid-cols-2 lg:grid-cols-3">
+        {isLoading ? (
+          <>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+              <Skeleton className="w-32 rounded-lg">
+                <div className="h-4 rounded-lg" />
+              </Skeleton>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-[#1C1C1C]">Email</p>
+              <p className="text-primary font-bold">{data?.email ?? <NA />}</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-[#1C1C1C]">Contact Number</p>
+              <p className="text-primary font-bold">
+                {data?.contactNumber ?? <NA />}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-[#1C1C1C]">Date of Birth</p>
+              <p className="text-primary font-bold">
+                {data?.dateOfBirth ? (
+                  DateTime.fromISO(data.dateOfBirth, { zone: "utc" })
+                    .toLocal()
+                    .toFormat("dd/MM/yyyy")
+                ) : (
+                  <NA />
+                )}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-[#1C1C1C]">Guardian Name</p>
+              <p className="text-primary font-bold">{data?.guardian?.name}</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-[#1C1C1C]">Guardian Email</p>
+              <p className="text-primary font-bold">{data?.guardian?.email}</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-[#1C1C1C]">Guardian Contact Number</p>
+              <p className="text-primary font-bold">
+                {data?.guardian?.contactNumber}
+              </p>
+            </div>
+          </>
+        )}
       </div>
-      <Divider className="mb-5 bg-[#D3D3D3]" />
     </section>
   );
 }

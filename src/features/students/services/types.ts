@@ -45,6 +45,7 @@ export type Guardian = {
 
 export type SchoolReference = {
   id: string;
+  name: string;
 };
 
 export type Student = BasicStudent & {
@@ -66,7 +67,6 @@ export type StudentDetails = BasicStudent & {
 
 export type StudentsQueryResponse = {
   students: Student[];
-  totalStudents: number;
 };
 
 export type TotalStudentsQueryResponse = {
@@ -85,3 +85,8 @@ export type StudentQueryInput = PaginationInput & {
   name?: string;
   accountType?: BusinessType;
 };
+
+import type { MutationResponse } from "@/core/services/types";
+
+export type CreateB2BStudentResponse = MutationResponse<"createStudent">;
+export type UpdateB2BStudentResponse = MutationResponse<"updateStudent">;

@@ -1,6 +1,5 @@
 import { useQuery } from "@apollo/client";
 import { SelectItem } from "@heroui/select";
-import { DevTool } from "@hookform/devtools";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
@@ -159,7 +158,6 @@ export default function BasicInfo() {
           )}
         />
       </div>
-      <DevTool control={control} />
     </React.Fragment>
   );
 }
