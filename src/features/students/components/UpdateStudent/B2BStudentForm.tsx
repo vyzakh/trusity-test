@@ -13,16 +13,18 @@ import { handleApolloError } from "@/core/errors";
 import type { BusinessType } from "@/core/services/types";
 import { omitKeys } from "@/core/utils/object";
 
-import { UPDATE_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
-import type { UpdateB2BStudentResponse } from "@/features/school/pages/students/services/types";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
 import type { GradesBySchoolQueryResponse } from "@/features/school/services/types";
 import { STUDENTS_QUERY } from "@/features/students/services/studentQueries";
-import type { StudentQueryResponse } from "@/features/students/services/types";
+import type {
+  StudentQueryResponse,
+  UpdateB2BStudentResponse,
+} from "@/features/students/services/types";
 import {
   CreateB2BStudentSchema,
   type UpdateB2BStudentSchemaType,
 } from "../../schemas/studentSchema";
+import { UPDATE_STUDENT_MUTATION } from "../../services/studentMutation";
 import GuardianDetails from "../GuardianDetails";
 import SchoolInfo from "../SchoolInfo";
 

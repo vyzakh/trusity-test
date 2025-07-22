@@ -35,6 +35,7 @@ export const Select = extendVariants(HerouiSelect, {
     size: "md",
     labelPlacement: "outside",
     placeholder: "Select",
+    variant: "bordered",
   },
 });
 

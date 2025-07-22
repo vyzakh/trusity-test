@@ -34,7 +34,7 @@ export default function Section({
         {selected && (
           <motion.div
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute -right-1 -top-1 z-[999] rounded-md bg-primary p-0.5"
+            className="bg-primary absolute -top-1 -right-1 z-[999] rounded-md p-0.5"
             exit={{ scale: 0, opacity: 0 }}
             initial={{ opacity: 0, scale: 0 }}
             transition={{ duration: 0.5, type: "spring" }}
@@ -68,7 +68,7 @@ export default function Section({
 
       <Button
         as="span"
-        className="relative size-10 min-w-0 p-0 px-0 peer-checked:border-primary"
+        className="peer-checked:border-primary relative size-10 min-w-0 p-0 px-0"
         radius="sm"
         variant="bordered"
       >

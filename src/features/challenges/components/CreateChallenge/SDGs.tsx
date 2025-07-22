@@ -22,31 +22,29 @@ export default function SDGs() {
 
   return (
     <div className="my-4 w-full space-y-2">
-      <p className="required mb-2">UN SDG Goals</p>
+      <p className={twMerge("required mb-2", isInvalid && "text-danger")}>
+        UN SDG Goals
+      </p>
       <Controller
         name="sdgIds"
         control={control}
         render={({ field }) => (
           <CheckboxGroup
+            {...field}
             color="primary"
             label={`Choose Goals (${sdgs.length})`}
             value={field.value}
             onValueChange={(val) => field.onChange(val)}
             classNames={{ label: "text-sm font-medium text-black mb-3" }}
           >
-            <div
-              className={twMerge(
-                "grid grid-cols-2 gap-3 p-2",
-                isInvalid && "border-danger rounded-lg border border-dashed",
-              )}
-            >
+            <div className="grid gap-3 md:grid-cols-2">
               {isLoadingSDGs
                 ? Array.from({ length: 17 }).map((_, index) => (
                     <div key={index} className="flex items-center gap-3">
                       <Skeleton className="w-5 rounded-sm">
                         <div className="h-5" />
                       </Skeleton>
-                      <Skeleton className="w-36 rounded-sm">
+                      <Skeleton className="w-44 rounded-sm">
                         <div className="h-5" />
                       </Skeleton>
                     </div>

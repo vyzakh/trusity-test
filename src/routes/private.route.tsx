@@ -11,8 +11,10 @@ import {
   CreateStudentPage,
   CreateTeacherPage,
   DashboardPage,
-  GlobalAddChallenge,
+  GlobalAssignChallengePage,
+  GlobalChallengeDetailsPage,
   GlobalChallengesPage,
+  GlobalCreateChallenge,
   GlobalCreateStudentPage,
   GlobalCreateTeachersPage,
   GlobalStudentDetailsPage,
@@ -51,7 +53,17 @@ const privateRoutes: RouteObject[] = [
             path: "challenges",
             children: [
               { index: true, element: <GlobalChallengesPage /> },
-              { path: "create", element: <GlobalAddChallenge /> },
+              { path: "create", element: <GlobalCreateChallenge /> },
+              {
+                path: ":challengeId",
+                children: [
+                  { index: true, element: <GlobalChallengeDetailsPage /> },
+                  {
+                    path: "assign",
+                    element: <GlobalAssignChallengePage />,
+                  },
+                ],
+              },
             ],
           },
           {

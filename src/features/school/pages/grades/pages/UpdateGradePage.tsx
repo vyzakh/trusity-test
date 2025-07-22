@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { Checkbox } from "@heroui/checkbox";
+import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
 import { Form } from "@heroui/form";
 import { SelectItem } from "@heroui/select";
 import { Skeleton } from "@heroui/skeleton";
@@ -10,7 +10,6 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import { twMerge } from "tailwind-merge";
 
-import { Sections } from "../../../components";
 import {
   CreateGradeSchema,
   type CreateGradeSchemaType,
@@ -21,6 +20,7 @@ import { FormSkeleton, FormWrapper, PageWrapper } from "@/components";
 import { BreadcrumbNav, Button, Select } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
 import { GRADES_BY_SCHOOL_QUERY } from "@/features/school/services/queries";
+import Section from "../components/Section";
 import { GRADES_AND_SECTIONS_QUERY } from "../services/gradeQueries";
 import type {
   GradesSectionsAndSchoolQueryInput,
@@ -87,16 +87,6 @@ export default function UpdateGradePage() {
   //SELECTED SECTION IDS
   const sectionIds = useWatch({ control, name: "sectionIds" }) || [];
 
-  //SECTION CHANGE HANDLER
-  const handleSectionChange = (value: number) => {
-    const currentSectionIds = sectionIds || [];
-    const newSectionIds = sectionIds.includes(value)
-      ? currentSectionIds.filter((sectionId) => sectionId !== value)
-      : [...currentSectionIds, value];
-
-    setValue("sectionIds", newSectionIds, { shouldValidate: true });
-  };
-
   //SELECT ALL SECTIONS HANDLER
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     const allSectionIds = data?.sections?.map((section) => section.id) || [];
@@ -135,7 +125,6 @@ export default function UpdateGradePage() {
   };
 
   React.useEffect(() => {
-    console.log("pppp");
     if (createdGrades.length > 0) {
       const currentGrade = createdGrades?.find(
         (grade) => grade.id === schoolGradeId,
@@ -213,39 +202,55 @@ export default function UpdateGradePage() {
               >
                 Section
               </p>
-              <Checkbox
-                className="mb-0.5"
-                classNames={{ label: "text-sm" }}
-                isSelected={
-                  sectionIds?.length !== 0 &&
-                  sectionIds?.length === data?.sections?.length
-                }
-                onChange={handleSelectAll}
-              >
-                Select All
-              </Checkbox>
 
-              <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(2.5rem,1fr))] gap-2">
-                {isLoading
-                  ? Array.from({ length: 26 }).map((_, i) => (
+              {isLoading ? (
+                <>
+                  <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(2.5rem,1fr))] gap-2">
+                    {Array.from({ length: 26 }).map((_, i) => (
                       <Skeleton key={i} className="w-10 rounded-lg">
                         <div className="bg-default-200 h-10 w-10 rounded-lg" />
                       </Skeleton>
-                    ))
-                  : sections?.map((section, i) => {
-                      const selected = sectionIds.includes(section.id);
-
-                      return (
-                        <Sections
-                          key={section.id}
-                          delay={i * 0.07}
-                          handleChangeSection={handleSectionChange}
-                          section={section}
-                          selected={selected}
-                        />
-                      );
-                    })}
-              </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Checkbox
+                    className="mb-0.5"
+                    classNames={{ label: "text-sm" }}
+                    isSelected={
+                      sectionIds?.length !== 0 &&
+                      sectionIds?.length === data?.sections?.length
+                    }
+                    onChange={handleSelectAll}
+                  >
+                    Select All
+                  </Checkbox>
+                  <CheckboxGroup
+                    onValueChange={(values) =>
+                      setValue("sectionIds", values.map(Number), {
+                        shouldValidate: true,
+                      })
+                    }
+                    value={sectionIds.map(String)}
+                  >
+                    <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(2.5rem,1fr))] gap-2">
+                      {sections?.map((section, i) => {
+                        return (
+                          <Section
+                            value={section.id.toString()}
+                            key={section.id}
+                            delay={i * 0.07}
+                            isInvalid={!!errors?.sectionIds}
+                          >
+                            {section?.section}
+                          </Section>
+                        );
+                      })}
+                    </div>
+                  </CheckboxGroup>
+                </>
+              )}
               {errors?.sectionIds && errors?.sectionIds?.message && (
                 <small className="text-tiny text-danger">
                   {errors?.sectionIds?.message}

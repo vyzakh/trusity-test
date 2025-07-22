@@ -39,7 +39,7 @@ const Pagination = ({ totalCount }: PaginationProps) => {
       <div className="flex items-center gap-1">
         <Select
           aria-label="Page Size"
-          className="w-16 shrink-0"
+          className="w-[4.2rem] shrink-0"
           classNames={{
             popoverContent: "p-0",
             trigger: "bg-transparent shadow-none",

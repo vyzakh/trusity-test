@@ -7,23 +7,46 @@ import {
   Textarea,
   Upload,
 } from "@/components/ui";
-import { useQuery } from "@apollo/client";
+import { handleApolloError } from "@/core/errors";
+import { useMutation, useQuery } from "@apollo/client";
 import { Form } from "@heroui/form";
 import { SelectItem } from "@heroui/select";
+import { addToast } from "@heroui/toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { SDGs } from "../components/CreateChallenge";
 import {
   CreateChallengeSchema,
   type CreateChallengeSchemaType,
 } from "../schemas/createChallengeSchema";
-import { CHALLENGE_SECTORS_QUERY } from "../services/challengeQueries";
-import type { ChallengeSectorsQueryResponse } from "../services/types";
+import { CREATE_CHALLENGE_MUTATION } from "../services/challengeMutations";
+import {
+  CHALLENGE_SECTORS_QUERY,
+  CHALLENGES_QUERY,
+} from "../services/challengeQueries";
+import type {
+  ChallengeSectorsQueryResponse,
+  CreateChallengePayload,
+  CreateChallengeResponse,
+} from "../services/types";
 
 export default function AddChallenge() {
+  const navigate = useNavigate();
+
+  //FETCH CHALLENGE SECTORS
   const { data: sectors, loading: isLoadingSectors } =
     useQuery<ChallengeSectorsQueryResponse>(CHALLENGE_SECTORS_QUERY);
 
+  //CREATE CHALLENGE MUTATION
+  const [createChallenge, { loading: isCreatingChallenge }] = useMutation<
+    CreateChallengeResponse,
+    { input: CreateChallengePayload }
+  >(CREATE_CHALLENGE_MUTATION, {
+    refetchQueries: [{ query: CHALLENGES_QUERY }],
+  });
+
+  //RHF CONFIGURATION
   const methods = useForm<CreateChallengeSchemaType>({
     resolver: zodResolver(CreateChallengeSchema),
     defaultValues: {
@@ -35,12 +58,36 @@ export default function AddChallenge() {
       sdgIds: [],
       title: "",
     },
+    mode: "onChange",
   });
 
+  //ALL CHALLENGE SECTORS
   const challengeSectors = sectors?.challengeSectors ?? [];
 
+  //CREATE CHALLENGE HANDLER
   const handleCreateChallenge = async (data: CreateChallengeSchemaType) => {
-    console.log(data);
+    const sdgIds = data?.sdgIds?.map(Number);
+    try {
+      const response = await createChallenge({
+        variables: {
+          input: { ...data, sdgIds, sectorId: Number(data.sectorId) },
+        },
+      });
+      addToast({
+        color: "success",
+        title: response.data?.createChallenge.message,
+      });
+      navigate("..");
+    } catch (error) {
+      const errMsg = handleApolloError(error);
+      addToast({ color: "danger", title: errMsg });
+    }
+  };
+
+  //CANCEL HANDLER
+  const handleCancel = () => {
+    methods.reset();
+    navigate("..");
   };
 
   return (
@@ -164,16 +211,15 @@ export default function AddChallenge() {
             <div className="mt-3 flex w-full items-center justify-end gap-2">
               <Button
                 color="default"
-                // disabled={isCreating}
-
+                disabled={isCreatingChallenge}
                 variant="flat"
-                // onPress={handleCancel}
+                onPress={handleCancel}
               >
                 Cancel
               </Button>
               <Button
                 color="primary"
-                //  isLoading={isCreating}
+                isLoading={isCreatingChallenge}
                 type="submit"
               >
                 Save

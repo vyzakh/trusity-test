@@ -26,7 +26,7 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
             <Skeleton className="h-3 w-40 rounded-xl" />
           ) : item.to ? (
             <Link to={item.to}>
-              <p className="max-w-xs truncate">{item.label}</p>
+              <p className="max-w-32 truncate">{item.label}</p>
             </Link>
           ) : (
             <p className="max-w-xs truncate">{item.label}</p>

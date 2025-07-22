@@ -13,7 +13,11 @@ import {
   type CreateSchoolSchemaType,
 } from "../../schemas/createSchoolSchema";
 import { UPDATE_SCHOOL_MUTATION } from "../../services/schoolMutations";
-import { SCHOOL_QUERY, SCHOOLS_QUERY } from "../../services/schoolQueries";
+import {
+  SCHOOL_NAMES_QUERY,
+  SCHOOL_QUERY,
+  SCHOOLS_QUERY,
+} from "../../services/schoolQueries";
 
 import { DEFAULT_VALUES } from "../../utils/constants";
 
@@ -44,6 +48,7 @@ export default function B2BForm({ schoolData }: B2BFormProps) {
     refetchQueries: [
       { query: SCHOOLS_QUERY, variables: { limit: 10, offset: 0 } },
       { query: SCHOOL_QUERY, variables: { schoolId: schoolId! } },
+      { query: SCHOOL_NAMES_QUERY },
     ],
   });
 

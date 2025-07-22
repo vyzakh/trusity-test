@@ -140,7 +140,17 @@ export default function ChallengesPage() {
                 <TableCell>{challenge?.companyName}</TableCell>
                 <TableCell>{challenge?.companyName}</TableCell>
                 <TableCell>{challenge?.companyName}</TableCell>
-                <TableCell>{challenge?.companyName}</TableCell>
+                <TableCell>
+                  <Button
+                    as={Link}
+                    className="action-btn min-w-min px-3 group-hover:border-[#4F78FB] group-hover:text-[#4F78FB]"
+                    size="sm"
+                    to={`${challenge.id}/assign`}
+                    variant="bordered"
+                  >
+                    Assign
+                  </Button>
+                </TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center">
                     <Button

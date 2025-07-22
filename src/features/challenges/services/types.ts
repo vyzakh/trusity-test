@@ -1,4 +1,4 @@
-import type { PaginationInput } from "@/core/services/types";
+import type { MutationResponse, PaginationInput } from "@/core/services/types";
 
 export type ChallengesQueryResponse = {
   challenges: {
@@ -42,3 +42,15 @@ export type SDG = {
 export type SDGsQueryResponse = {
   sdgs: SDG[];
 };
+
+export type CreateChallengePayload = {
+  title: string;
+  companyName: string;
+  description: string;
+  expectation: string;
+  logoUrl: string;
+  sdgIds: number[];
+  sectorId: number;
+};
+
+export type CreateChallengeResponse = MutationResponse<"createChallenge">;

@@ -178,6 +178,7 @@ export default function Upload({
                   // multiple={!!props.multiple}
                   name={label?.toString()}
                   type="file"
+                  accept={allowedFormats.join(", ")}
                   onChange={handleUploadFile}
                 />
               </VisuallyHidden>

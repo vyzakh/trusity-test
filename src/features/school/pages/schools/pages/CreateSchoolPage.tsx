@@ -16,7 +16,11 @@ import { DEFAULT_VALUES } from "../utils/constants";
 import { FormWrapper, PageWrapper } from "@/components";
 import { BreadcrumbNav, Button } from "@/components/ui";
 import { handleApolloError } from "@/core/errors";
-import { SCHOOLS_QUERY, TOTAL_SCHOOLS_QUERY } from "../services/schoolQueries";
+import {
+  SCHOOL_NAMES_QUERY,
+  SCHOOLS_QUERY,
+  TOTAL_SCHOOLS_QUERY,
+} from "../services/schoolQueries";
 import type {
   CreateB2BSchoolPayload,
   CreateSchoolResponse,
@@ -33,6 +37,7 @@ export default function CreateSchoolPage() {
     refetchQueries: [
       { query: SCHOOLS_QUERY, variables: { limit: 10, offset: 0 } },
       { query: TOTAL_SCHOOLS_QUERY },
+      { query: SCHOOL_NAMES_QUERY },
     ],
   });
 

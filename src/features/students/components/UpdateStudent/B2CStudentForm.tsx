@@ -30,15 +30,17 @@ import type {
   CreateSchoolResponse,
   SchoolsQueryResponse,
 } from "@/features/school/pages/schools/services/types";
-import { UPDATE_STUDENT_MUTATION } from "@/features/school/pages/students/services/studentMutations";
-import type { UpdateB2BStudentResponse } from "@/features/school/pages/students/services/types";
 import { STUDENTS_QUERY } from "@/features/students/services/studentQueries";
-import type { StudentQueryResponse } from "@/features/students/services/types";
+import type {
+  StudentQueryResponse,
+  UpdateB2BStudentResponse,
+} from "@/features/students/services/types";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/modal";
 import {
   CreateB2CStudentSchema,
   type CreateB2CStudentSchemaType,
 } from "../../schemas/studentSchema";
+import { UPDATE_STUDENT_MUTATION } from "../../services/studentMutation";
 import CreateB2CSchoolForm from "../CreateB2CSchoolForm";
 import GuardianDetails from "../GuardianDetails";
 
