@@ -28,7 +28,7 @@ export default function Header() {
         borderImageSlice: 1,
       }}
     >
-      <div className="relative grid h-[var(--header-height)] grid-cols-[var(--sidebar-width)_1fr] gap-5 bg-white/[0.001] backdrop-blur before:absolute before:inset-0 before:-z-[1] before:rounded-md before:bg-white/20 before:backdrop-blur-md before:content-[''] lg:grid-cols-[var(--sidebar-width)_1fr_var(--sidebar-width)]">
+      <div className="relative grid h-(--header-height) grid-cols-[var(--sidebar-width)_1fr] gap-5 bg-white/[0.001] backdrop-blur before:absolute before:inset-0 before:-z-[1] before:rounded-md before:bg-white/20 before:backdrop-blur-md before:content-[''] lg:grid-cols-[var(--sidebar-width)_1fr_var(--sidebar-width)]">
         <section className="grid place-items-center px-2">
           <Logo />
         </section>

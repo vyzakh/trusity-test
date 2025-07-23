@@ -9,11 +9,11 @@ export default function DashboardLayout() {
   useScrollToTop();
 
   return (
-    <div className="radial-background-fixed relative isolate flex grow flex-col">
+    <section className="radial-background-fixed relative isolate flex grow flex-col">
       <Header />
       <Sidebar />
       <Content />
       <SideDrawer />
-    </div>
+    </section>
   );
 }

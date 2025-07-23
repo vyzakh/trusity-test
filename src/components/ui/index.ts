@@ -1,11 +1,13 @@
 export { default as Autocomplete } from "./auto-complete";
 export { default as BreadcrumbNav } from "./breadcrumb-nav";
 export { default as Button } from "./button";
+export { default as Checkbox } from "./checkbox";
 export { default as ConfirmModal } from "./confirm-modal";
 export { default as DatePicker } from "./date-picker";
 export { default as Input } from "./input";
 export { default as NumberInput } from "./number-input";
 export { default as Pagination } from "./pagination";
+export { default as PasswordInput } from "./password-input";
 export * from "./phone-input";
 export { default as Select } from "./select";
 export * from "./table";

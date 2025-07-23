@@ -1,3 +1,4 @@
+export * from "./auth/pages";
 export * from "./challenges/pages";
 export * from "./dashboard/pages";
 export * from "./school/pages";
