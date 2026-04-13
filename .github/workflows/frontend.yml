@@ -1,9 +1,9 @@
 name: Docker CI CD
 
 on:
-  push: 
+  push:
     branches:
-       - main
+      - main
 jobs:
   build-and-deploy:
      runs-on:  ubuntu-latest
