@@ -1,20 +1,19 @@
-import { useQueryState } from "nuqs";
+import { useQueryState, parseAsString } from "nuqs";
 import { useDebounce } from "use-debounce";
-import { z } from "zod";
 import { usePagination } from "./usePagination";
 
 export const useSearchName = (debounceMs: number = 300) => {
   const { updateSearchParams } = usePagination();
-  const [name, setName] = useQueryState("name", z.string().nullable());
+  const [name, setName] = useQueryState("name", parseAsString); 
   const [debouncedName] = useDebounce(name, debounceMs);
 
   const handleSearch = (value: string) => {
-    setName(value !== "" ? value : null);
+    setName(value !== "" ? value : "");
     updateSearchParams({ page: 1 });
   };
 
   const handleClear = () => {
-    setName(null);
+    setName("");
     updateSearchParams({ page: 1 });
   };
 

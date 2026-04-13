@@ -35,8 +35,8 @@ export default function AssignChallengePage() {
 
   const {
     fields: assignmentFields,
-    append: appendAssignment,
-    remove: removeAssignment,
+   // append: appendAssignment,
+   // remove: removeAssignment,
     replace: replaceAssignment,
   } = useFieldArray({
     control: methods.control,

@@ -7,11 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { useQueryState } from "nuqs";
+import { useQueryState, parseAsString } from "nuqs";
 import { Link } from "react-router";
 import { twMerge } from "tailwind-merge";
 import { useDebounce } from "use-debounce";
-import { z } from "zod";
 
 import {
   TEACHERS_QUERY,
@@ -42,7 +41,7 @@ const columns = [
 
 export default function TeachersPage() {
   const { limit, page, offset, updateSearchParams } = usePagination();
-  const [name, setName] = useQueryState("name", z.string().nullable());
+  const [name, setName] = useQueryState("name", parseAsString);  
   const [debouncedName] = useDebounce(name, 300);
   const { data, loading } = useQuery<TeachersQueryResponse, TeachersQueryInput>(
     TEACHERS_QUERY,

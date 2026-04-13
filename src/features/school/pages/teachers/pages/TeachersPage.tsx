@@ -7,11 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { useQueryState } from "nuqs";
+import { useQueryState, parseAsString } from "nuqs";
 import { Link, useParams } from "react-router";
 import { twMerge } from "tailwind-merge";
 import { useDebounce } from "use-debounce";
-import { z } from "zod";
 
 import { Button } from "@/components/ui";
 import Pagination from "@/components/ui/pagination";
@@ -38,7 +37,7 @@ const columns = [
 export default function TeacherPage() {
   const { schoolId } = useParams<{ schoolId: string }>();
   const { limit, page, offset, updateSearchParams } = usePagination();
-  const [name, setName] = useQueryState("name", z.string().nullable());
+  const [name, setName] = useQueryState("name", parseAsString); 
   const [debouncedName] = useDebounce(name, 300);
   const { data: teachersData, loading } = useQuery<
     TeachersQueryResponse,

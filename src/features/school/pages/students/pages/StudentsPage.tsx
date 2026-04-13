@@ -7,12 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { useQueryStates } from "nuqs";
+import { useQueryStates, parseAsString } from "nuqs";
 import { Link, useParams } from "react-router";
 import { twMerge } from "tailwind-merge";
 
 import {
-  StudentFilterSchema,
+ // StudentFilterSchema,
   type StudentFilterSchemaType,
 } from "../schemas/studentFilterSchema";
 
@@ -46,11 +46,15 @@ const columns = [
 ];
 
 export default function StudentsPage() {
-  const { schoolId } = useParams<{ schoolId: string }>();
-  const { limit, offset, page } = usePagination();
-  const { debouncedName, name, handleClear, handleSearch } = useSearchName();
-  const [filters, setFilters] = useQueryStates(StudentFilterSchema.shape);
+ const { schoolId } = useParams<{ schoolId: string }>();
+const { limit, offset, page } = usePagination();
+const { debouncedName, name, handleClear, handleSearch } = useSearchName();
+   const filtersConfig = {
+  schoolGradeId: parseAsString,
+  schoolSectionId: parseAsString,
+};
 
+const [filters, setFilters] = useQueryStates(filtersConfig);
   //STUDENTS QUERY
   const { data: studentsData, loading } = useQuery<
     StudentsQueryResponse,

@@ -1,13 +1,12 @@
-import { useQueryStates } from "nuqs";
-import { z } from "zod";
-
+import { useQueryStates, parseAsInteger } from "nuqs";
 type PaginationProps = number | string;
 
 export const usePagination = (totalCount: PaginationProps = 0) => {
   const [{ size, page }, setQuery] = useQueryStates(
     {
-      page: z.coerce.number().int().min(1).default(1),
-      size: z.coerce.number().int().min(1).default(10),
+      page: parseAsInteger.withDefault(1),
+      size: parseAsInteger.withDefault(10),
+
     },
     { history: "push", clearOnDefault: true },
   );

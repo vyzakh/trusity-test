@@ -20,12 +20,12 @@ import { Button, Pagination } from "@/components/ui";
 import { DEFAULT_ROW_STYLES, Table } from "@/components/ui/table";
 import { usePagination } from "@/core/hooks/usePagination";
 import { useSearchName } from "@/core/hooks/useSearchName";
+import { useQueryStates, parseAsString } from "nuqs";
 import { getSerialNumber } from "@/core/utils/pagination";
 import {
-  StudentFilterSchema,
+ // StudentFilterSchema,
   type StudentFilterSchemaType,
 } from "@/features/school/pages/students/schemas/studentFilterSchema";
-import { useQueryStates } from "nuqs";
 import { TopContent } from "../components";
 import type {
   StudentQueryInput,
@@ -46,10 +46,15 @@ const columns = [
 ];
 
 export default function StudentsPage() {
-  const { limit, page, offset } = usePagination();
+   const { limit, offset, page } = usePagination();
   const { debouncedName, name, handleClear, handleSearch } = useSearchName();
-  const [filters, setFilters] = useQueryStates(StudentFilterSchema.shape);
 
+  const filtersConfig = {
+  schoolGradeId: parseAsString,
+  schoolSectionId: parseAsString,
+};
+
+const [filters, setFilters] = useQueryStates(filtersConfig);
   const { data, loading } = useQuery<StudentsQueryResponse, StudentQueryInput>(
     STUDENTS_QUERY,
     {
