@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
-     runs-on:  ubuntu-latest
+    runs-on: ubuntu-latest
 
-     steps:
+    steps:
       - name: checkout code
         uses: actions/checkout@v4
-
     # login to Docker hub
 
       - name: login to Docker hub
