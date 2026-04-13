@@ -12,30 +12,28 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
-    # login to Docker hub
 
+      # login to Docker hub
       - name: login to Docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-    # Build image
-      - name: Build docker image 
+
+      # Build image
+      - name: Build docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest .
-    # push image
+
+      # push image
       - name: push image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest
 
-    # deploy to server
-
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest
-          docker stop frontend || true
-          docker rm frontend || true
-          docker run -d -p 3000:80 --name frontend ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest      
-  
-
-
+      # deploy to server
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest
+            docker stop frontend || true
+            docker rm frontend || true
+            docker run -d -p 3000:80 --name frontend ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest
