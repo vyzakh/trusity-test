@@ -19,7 +19,10 @@ jobs:
 
       # Build image
       - name: Build docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest .
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=${{ secrets.API_URL }} \
+            -t ${{ secrets.DOCKER_USERNAME }}/trusity-frontend:latest .
 
       # push image
       - name: push image
